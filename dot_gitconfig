@@ -1,0 +1,261 @@
+# Git Configuration (.gitconfig)
+#
+# References:
+# - https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+# - https://www.youtube.com/watch?v=DZI0Zl-1JqQ
+#
+
+# Aliases for common Git operations to improve workflow
+[alias]
+  # Pull from origin using the current branch name
+  # Usage: git pll
+  pll = "!sh -c 'git config pull.rebase \"${PULL_REBASE:-true}\" && git pull origin \"$(git rev-parse --abbrev-ref HEAD)\"'"
+
+  # Push to origin using the current branch name
+  # Usage: git psh
+  psh = "!sh -c 'branch=$(git rev-parse --abbrev-ref HEAD) && git push origin "$branch" "$@"' -"
+
+  # Pretty git log with commit hash, branch names, commit message, and author
+  # Usage: git lol
+  lol = "!sh -c 'git log --pretty=format:\"%C(auto)%h %d %s %C(green)(%an <%ae>)\" --decorate --all'"
+
+  # Graphical visualization of commit history
+  # Usage: git graph
+  #graph = "!sh -c 'git log --oneline --graph --decorate --all'"
+  graph = "!sh -c 'git log --graph --decorate --all --pretty=format:\"%C(yellow)%h%Creset %Cgreen(%an)%Creset %C(auto)%d%Creset %s\"'"
+
+  # Shorder name for checkout
+  co = "!sh -c 'git checkout "$@"' -"
+
+  # Shorder name for commit
+  c = "!sh -c 'git commit "$@"' -"
+
+  # Amend and push to the same commit
+  amn = "!sh -c '. \"$(dirname \"$(readlink \"$HOME/.gitconfig\")\")/aliases/amend_and_push.sh\"; amend_and_push \"$@\"' -"
+
+  # Branch Cleanup
+  bcp = "!sh -c 'git branch | grep -v main | while read b; do git branch -d $b || git branch -D $b; done'"
+
+  # Merge the traditional way
+  m = "!sh -c 'git config pull.rebase false && git merge "${@:-main}"'"
+
+  # Merge using rebase
+  mr = "!sh -c 'git config pull.rebase true && git merge "${@:-main}"'"
+
+# Core configuration settings for Git behavior
+[core]
+	# Use a specific SSH key for Git operations
+	# This is useful when you have multiple SSH keys and want Git to use a specific one
+	sshCommand = "ssh -i ~/.ssh/id_ed25519"
+
+	# Configure the pager for Git output
+	# -F: Quit if content fits on one screen
+	# -X: Don't clear screen when exiting
+	pager = less -F -X
+
+	# Handle line ending conversions
+	# input: Convert CRLF to LF when committing, but don't convert when checking out
+	# This is ideal for cross-platform development
+	autocrlf = input
+
+	# # Prevent Git from committing files with mixed line endings
+	# # true: Reject commits that would cause mixed line endings
+	# safecrlf = true
+
+	# # Default line ending style for new files
+	# # lf: Use Unix-style line endings (LF) as the default
+	# eol = lf
+  symlinks = true
+
+# User identity used for commits
+[user]
+  # Email address used in commit messages
+  email = dragos.cirjan@gmail.com
+
+  # Full name used in commit messages
+  name = Dragos Cirjan
+
+# Safe directory settings
+[safe]
+	# List directories that Git should consider safe even if they're owned by someone else
+	# This is useful when working inside Docker containers or in certain shared environments
+	directory =
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\catppuccin
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\conform.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\flash.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\friendly-snippets
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\fzf-lua
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\gitsigns.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\grug-far.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazy.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazydev.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\LazyVim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lualine.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason-lspconfig.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.ai
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.icons
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.pairs
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\neo-tree.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\noice.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nui.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lint
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lspconfig
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter-textobjects
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-ts-autotag
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\persistence.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\plenary.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\snacks.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\todo-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\tokyonight.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\trouble.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\ts-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\which-key.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\catppuccin
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\conform.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\flash.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\friendly-snippets
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\fzf-lua
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\gitsigns.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\grug-far.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazy.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazydev.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\LazyVim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lualine.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason-lspconfig.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.ai
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.icons
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.pairs
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\neo-tree.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\noice.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nui.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lint
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lspconfig
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter-textobjects
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-ts-autotag
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\persistence.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\plenary.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\snacks.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\todo-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\tokyonight.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\trouble.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\ts-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\which-key.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\catppuccin
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\conform.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\flash.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\friendly-snippets
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\fzf-lua
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\gitsigns.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\grug-far.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazy.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazydev.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\LazyVim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lualine.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason-lspconfig.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.ai
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.icons
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.pairs
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\neo-tree.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\noice.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nui.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lint
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lspconfig
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter-textobjects
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-ts-autotag
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\persistence.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\plenary.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\snacks.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\todo-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\tokyonight.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\trouble.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\ts-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\which-key.nvim
+
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\Workspace\\gh--dragoscirjan\\configs\\ide\\neovim-config
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\blink-cmp-copilot
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\catppuccin
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\clangd_extensions.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\conform.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\copilot.lua
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\copilot.vim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\CopilotChat.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\flash.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\friendly-snippets
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\fzf-lua
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\gitsigns.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\grug-far.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazy.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lazydev.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\LazyVim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\lualine.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\markdown-preview.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason-lspconfig.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mason.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.ai
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.icons
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\mini.pairs
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\neo-tree.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\noice.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nui.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lint
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-lspconfig
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter-textobjects
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\nvim-ts-autotag
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\persistence.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\plenary.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\render-markdown.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\SchemaStore.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\snacks.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\todo-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\tokyonight.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\trouble.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\ts-comments.nvim
+	directory = C:\\Users\\drago\\AppData\\Local\\nvim-data\\lazy\\which-key.nvim
+# Specify the path for global gitattributes
+# These settings will be applied to all repositories
+[core]
+	# Point to a global gitattributes file
+	attributesfile = ~/.gitattributes
+
+# Conditional inclusion for organization-specific settings
+[includeIf "gitdir:*/Cellebrite/"]
+  # Include additional Git configuration when working in Cellebrite repositories
+  # This allows using different user identities or settings for work vs personal projects
+  path = ~/.gitconfig.Cellebrite
+[init]
+	defaultBranch = main

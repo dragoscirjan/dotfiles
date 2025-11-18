@@ -31,7 +31,7 @@
   c = "!sh -c 'git commit "$@"' -"
 
   # Amend and push to the same commit
-  amn = "!sh -c '. \"~/.gitconfig.aliases/amend_and_push.sh\"; amend_and_push \"$@\"' -"
+  amn = "!sh -c '. \"$HOME/.gitconfig.aliases/amend_and_push.sh\"; amend_and_push \"$@\"' -"
 
   # Branch Cleanup
   bcp = "!sh -c 'git branch | grep -v main | while read b; do git branch -d $b || git branch -D $b; done'"

@@ -1,7 +1,9 @@
 {{ if ne .chezmoi.os "windows" }}
 readonly_Documents/**
 Documents/**
+AppData/**
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
 .config/powershell/**
+.config/alacritty/**
 {{ end }}

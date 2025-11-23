@@ -1,0 +1,9 @@
+[".config/nvim"]
+type = "git-repo"
+url = "https://github.com/dragoscirjan/nvim-config.git"
+refreshPeriod = "168h"                                  # Updates weekly
+
+["AppData/Local/nvim"]
+type = "git-repo"
+url = "https://github.com/dragoscirjan/nvim-config.git"
+refreshPeriod = "168h"                                  # Updates weekly

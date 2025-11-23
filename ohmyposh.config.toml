@@ -1,0 +1,146 @@
+"$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
+final_space = true
+version = 3
+
+[[blocks]]
+type = "prompt"
+alignment = "left"
+newline = false
+
+# OS Icon
+#
+
+[[blocks.segments]]
+type = "os"
+style = "plain"
+foreground = "#666666"
+background = "transparent"
+template = "{{ if .WSL }}WSL at {{ end }}{{.Icon}}"
+
+[[blocks.segments]]
+type = "text"
+style = "plain"
+template = " ❯ "
+foreground = "#666666"
+
+# Language Icons
+#
+
+[[blocks.segments]]
+type = "node"
+style = "powerline"
+foreground = "#6CA35E"
+background = "transparent"
+template = ""
+
+[[blocks.segments]]
+type = "go"
+style = "powerline"
+foreground = "#ffffff"
+background = "transparent"
+template = ""
+
+[[blocks.segments]]
+type = "python"
+style = "powerline"
+foreground = "#100e23"
+background = "transparent"
+template = ""
+
+[[blocks.segments]]
+type = "rust"
+style = "powerline"
+foreground = "#193549"
+background = "transparent"
+template = ""
+
+[[blocks.segments]]
+type = "zig"
+style = "powerline"
+foreground = "#342311"
+background = "transparent"
+template = ""
+
+# [[blocks.segments]]
+# type = "text"
+# style = "plain"
+# foreground = "#666666"
+# template = " ❯ "
+# enabled = true
+# include_folders = ["**/package.json"]
+
+# Path Settings
+#
+
+[[blocks.segments]]
+type = "path"
+style = "powerline"
+foreground = "blue"
+background = "transparent"
+# template = '{{.Path}}'
+template = ' {{.Path}}'
+
+[blocks.segments.properties]
+# style = "agnoster"
+style = "folder"
+folder_icon = ""
+folder_separator_icon = " / "
+home_icon = "~"
+
+[blocks.segments.properties.mapped_locations]
+# TODO: Can this be used as an enviroment variable?
+# "$env:USERPROFILE" = ""
+"$env:TEMP" = ""
+
+# Source Control
+#
+
+[[blocks.segments]]
+type = "git"
+style = "powerline"
+foreground = "cyan"
+background = "transparent"
+template = '(<magenta>{{ if gt .Behind 0 }}⇣{{end}}{{ if gt .Ahead 0 }}⇡{{ end }}{{ if and (eq .Behind 0) (eq .Ahead 0) }}{{end}}</> {{ .HEAD }}<magenta>{{ if .Working.Changed }}  {{end}}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}</>)'
+
+[blocks.segments.properties]
+branch_icon = ""
+fetch_status = true
+fetch_upstream_icon = true
+source = "cli"
+
+[[blocks.segments]]
+type = "jujutsu"
+style = "powerline"
+foreground = "cyan"
+background = "transparent"
+template = '(<magenta>{{ if gt .Behind 0 }}⇣{{end}}{{ if gt .Ahead 0 }}⇡{{ end }}{{ if and (eq .Behind 0) (eq .Ahead 0) }}{{end}}</> {{ .HEAD }}<magenta>{{ if .Working.Changed }}  {{end}}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}</>)'
+
+[blocks.segments.properties]
+branch_icon = ""
+fetch_status = true
+fetch_upstream_icon = true
+source = "cli"
+
+# Status Code
+#
+
+[[blocks.segments]]
+type = "status"
+style = "diamond"
+foreground = "green"
+background = "transparent"
+foreground_templates = ["{{ if .Error }}#e91e63{{ end }}"]
+trailing_diamond = ""
+template = " "
+
+[blocks.segments.properties]
+always_enabled = true
+
+# Prompt Symbol
+#
+
+[[blocks.segments]]
+type = "text"
+style = "plain"
+foreground = "blue"
+template = " ❯ "

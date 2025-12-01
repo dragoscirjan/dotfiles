@@ -8,3 +8,6 @@ AppData/**
 .config/alacritty/**
 .config/nvim/**
 {{ end }}
+{{ if ne .chezmoi.hostname "omarchy" }}
+.config/hypr/**
+{{ end }}

@@ -19,6 +19,7 @@ Library/**
 .config/ghostty/**
 {{ end }}
 
-{{ if ne .chezmoi.hostname "omarchy" }}
+{{ if not (stat (joinPath .chezmoi.homeDir ".config/omarchy")) }}
 .config/hypr/**
+dot_bashrc
 {{ end }}

@@ -1,0 +1,13 @@
+{{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
+{{- template "dot_bashrc/omarchy" . -}}
+{{ end }}
+
+export PATH=$HOME/.local/bin:$HOME/bin:$PATH
+
+{{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
+# until I fix Omarchy gpu issue
+alias code='code --disable-gpu'
+{{end}}
+
+# TODO: Omarchy may fail on loading oh-my-posh
+eval "$(oh-my-posh init bash --config ~/ohmyposh.config.toml)"

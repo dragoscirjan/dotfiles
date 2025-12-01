@@ -7,7 +7,18 @@ AppData/**
 .config/powershell/**
 .config/alacritty/**
 .config/nvim/**
+.config/ghostty/**
+Library/**
 {{ end }}
+
+{{ if eq .chezmoi.os "linux" }}
+Library/**
+{{ end }}
+
+{{ if eq .chezmoi.os "darwin" }}
+.config/ghostty/**
+{{ end }}
+
 {{ if ne .chezmoi.hostname "omarchy" }}
 .config/hypr/**
 {{ end }}

@@ -1,0 +1,54 @@
+export PATH=$HOME/.local/bin:$HOME/bin:$PATH
+
+{{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
+# until I fix Omarchy gpu issue
+alias code='code --disable-gpu'
+{{end}}
+
+# OhMyPosh
+#
+# TODO: Omarchy may fail on loading oh-my-posh
+eval "$(oh-my-posh init bash --config ~/ohmyposh.config.toml)"
+
+# Preferred editor for local and remote sessions
+#
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+# Nvm
+if [ -d "$HOME/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+
+  # This loads nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  # This loads nvm bash_completion
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+  export NODE_VERSION="lts/jod"
+
+  # Check if Node.js is installed and matches the desired version
+  INSTALLED_VERSION=$(nvm version $NODE_VERSION)
+  if [ "$INSTALLED_VERSION" = "N/A" ]; then
+    echo "Node.js $NODE_VERSION not found. Installing..."
+    nvm install $NODE_VERSION
+  fi
+  echo "Using Node.js $NODE_VERSION"
+  nvm use $NODE_VERSION
+fi
+
+# export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+# export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
+
+# # bun completions
+# [ -s "/Users/dragosc/.bun/_bun" ] && source "/Users/dragosc/.bun/_bun"
+
+# # bun
+# export BUN_INSTALL="$HOME/.bun"
+# export PATH="$BUN_INSTALL/bin:$PATH"
+
+# . "$HOME/.local/bin/env"
+
+# . "$HOME/.llvmrc"

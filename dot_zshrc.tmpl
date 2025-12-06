@@ -1,9 +1,9 @@
 {{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
-{{- template "dot_bashrc/omarchy" . -}}
+{{- template "dot_zshrc/omarchy" . -}}
 {{ end }}
 
 {{ if eq .chezmoi.os "darwin" }}
-{{- template "dot_bashrc/macos" . -}}
+{{- template "dot_zshrc/macos" . -}}
 {{ end }}
 
 {{- template "dot_xshrc" . -}}

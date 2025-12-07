@@ -8,7 +8,7 @@ alias code='code --disable-gpu'
 # OhMyPosh
 #
 # TODO: Omarchy may fail on loading oh-my-posh
-eval "$(oh-my-posh init bash --config ~/ohmyposh.config.toml)"
+eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
 
 # Preferred editor for local and remote sessions
 #
@@ -19,6 +19,7 @@ else
 fi
 
 # Nvm
+#
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
 
@@ -38,6 +39,14 @@ if [ -d "$HOME/.nvm" ]; then
   echo "Using Node.js $NODE_VERSION"
   nvm use $NODE_VERSION
 fi
+
+{{ if eq .chezmoi.os "darwin" }}
+# Autojump -> https://github.com/wting/autojump
+# TODO: this may be available on Linux as well
+#
+[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] \
+    && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
+{{ end }}
 
 # export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 # export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"

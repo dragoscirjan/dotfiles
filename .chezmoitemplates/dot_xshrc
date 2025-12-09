@@ -1,9 +1,8 @@
+
+
 export PATH=$HOME/.local/bin:$HOME/bin:$PATH
 
-{{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
-# until I fix Omarchy gpu issue
-alias code='code --disable-gpu'
-{{end}}
+
 
 # Override cd to
 # - auto-use nvm when entering directories with .nvmrc
@@ -15,7 +14,8 @@ cd() {
   fi
 }
 
-# Override cat to use bat if available
+# Override cat to use bat (-> https://github.com/sharkdp/bat) if available
+#
 cat() {
   local batcmd=""
   if [ -z "$NO_BAT" ]; then
@@ -49,7 +49,12 @@ cat() {
         -E)
           bat_args+=("--show-ends")
           ;;
-
+        --style=*)
+          BAT_STYLE="${1#*=}"
+          ;;
+        --paging=*)
+          BAT_PAGING=("${1#*=}")
+          ;;
         --)
           shift
           while [ $# -gt 0 ]; do files+=("$1"); shift; done
@@ -64,7 +69,7 @@ cat() {
       esac
       shift
     done
-    BAT_STYLE="plain" BAT_PAGING="never" "$batcmd" "${bat_args[@]}" -- "${files[@]}"
+    "$batcmd" --style=$BAT_STYLE --paging=$BAT_PAGING "${bat_args[@]}" -- "${files[@]}"
   else
     command cat "$@"
   fi
@@ -104,14 +109,6 @@ if [ -d "$HOME/.nvm" ]; then
   echo "Using Node.js $NODE_VERSION"
   nvm use $NODE_VERSION
 fi
-
-{{ if eq .chezmoi.os "darwin" }}
-# Autojump -> https://github.com/wting/autojump
-# TODO: this may be available on Linux as well
-#
-[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] \
-    && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
-{{ end }}
 
 # export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 # export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"

@@ -5,6 +5,71 @@ export PATH=$HOME/.local/bin:$HOME/bin:$PATH
 alias code='code --disable-gpu'
 {{end}}
 
+# Override cd to
+# - auto-use nvm when entering directories with .nvmrc
+#
+cd() {
+  builtin cd "$@"
+  if [ -d "$HOME/.nvm" ] && [ -f .nvmrc ]; then
+    nvm use
+  fi
+}
+
+# Override cat to use bat if available
+cat() {
+  local batcmd=""
+  if [ -z "$NO_BAT" ]; then
+    if command -v bat >/dev/null 2>&1; then
+      batcmd="bat"
+    elif command -v batcat >/dev/null 2>&1; then
+      batcmd="batcat"
+    fi
+  fi
+  if [ -n "$batcmd" ]; then
+    # Map common cat options to bat equivalents
+    local bat_args=()
+    local files=()
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        -n)
+          bat_args+=("--number")
+          ;;
+        -b)
+          bat_args+=("--number-nonblank")
+          ;;
+        -s)
+          bat_args+=("--squeeze-blank")
+          ;;
+        -A)
+          bat_args+=("--show-all")
+          ;;
+        -T)
+          bat_args+=("--show-tabs")
+          ;;
+        -E)
+          bat_args+=("--show-ends")
+          ;;
+
+        --)
+          shift
+          while [ $# -gt 0 ]; do files+=("$1"); shift; done
+          break
+          ;;
+        -*)
+          bat_args+=("$1")
+          ;;
+        *)
+          files+=("$1")
+          ;;
+      esac
+      shift
+    done
+    BAT_STYLE="plain" BAT_PAGING="never" "$batcmd" "${bat_args[@]}" -- "${files[@]}"
+  else
+    command cat "$@"
+  fi
+}
+
 # OhMyPosh
 #
 # TODO: Omarchy may fail on loading oh-my-posh

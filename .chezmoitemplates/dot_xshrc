@@ -69,7 +69,7 @@ cat() {
       esac
       shift
     done
-    "$batcmd" --style=$BAT_STYLE --paging=$BAT_PAGING "${bat_args[@]}" -- "${files[@]}"
+    BAT_STYLE="plain" BAT_PAGING="never" "$batcmd" "${bat_args[@]}" -- "${files[@]}"
   else
     command cat "$@"
   fi

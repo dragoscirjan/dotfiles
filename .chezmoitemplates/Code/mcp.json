@@ -1,0 +1,54 @@
+{
+  "servers": {
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "type": "http"
+    },
+    "websearch": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "websearch-mcp@1.0.3"
+      ],
+      "env": {
+        "API_URL": "${input:api_url}",
+        "MAX_SEARCH_RESULT": "${input:max_search_result}"
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "json-memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-5b8a6d10-0f0c-4828-9fe8-d7b197f9524b"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "id": "api_url",
+      "type": "promptString",
+      "description": "WebSearch Crawler API URL"
+    },
+    {
+      "id": "max_search_result",
+      "type": "promptString",
+      "description": "Maximum number of search results to return (MAX_SEARCH_RESULT)"
+    }
+  ],
+  "servers.enabled": true,
+  "trace.server": "off"
+}

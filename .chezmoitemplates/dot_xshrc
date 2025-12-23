@@ -14,6 +14,8 @@ cd() {
   fi
 }
 
+[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
+
 # Override cat to use bat (-> https://github.com/sharkdp/bat) if available
 #
 cat() {

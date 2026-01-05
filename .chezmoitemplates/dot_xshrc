@@ -125,3 +125,40 @@ fi
 # . "$HOME/.local/bin/env"
 
 # . "$HOME/.llvmrc"
+
+install_utils() {
+  if ! command -v oh-my-posh >/dev/null; then
+    uname -a | grep linux > /dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
+    uname -a | grep darwin > /dev/null && brew install jandedobbeleer/oh-my-posh/oh-my-posh
+  fi
+
+  if ! command -v chezmoi >/dev/null; then
+    uname -a | grep linux > /dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
+    uname -a | grep darwin > /dev/null && brew install chezmoi
+
+    sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
+  fi
+
+  if ! command -v fzf >/dev/null; then
+    uname -a | grep linux > /dev/null \
+      && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
+      && ~/.fzf/install
+    uname -a | grep darwin > /dev/null && brew install fzf
+  fi
+
+  if ! command -v mise >/dev/null; then
+    uname -a | grep linux > /dev/null && curl https://mise.run | sh
+    uname -a | grep darwin > /dev/null && brew install mise
+  fi
+
+  if ! command -v nvm >/dev/null; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  fi
+
+  if ! command -v uv >/dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | bash
+  fi
+
+  afdsafdsa 2>&1  | grep -e "^zsh" > /dev/null && source ~/.zshrc
+  afdsafdsa 2>&1  | grep -e "^bash" > /dev/null && source ~/.bashrc
+}

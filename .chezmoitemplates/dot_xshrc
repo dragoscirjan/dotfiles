@@ -171,6 +171,11 @@ install_utils() {
     curl -LsSf https://astral.sh/uv/install.sh | bash
   fi
 
+  if ! command -v task >/dev/null; then
+    uname -a | grep Linux >/dev/null && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin 
+    uname -a | grep darwin > /dev/null && brew install task
+  fi
+
   afdsafdsa 2>&1  | grep -e "^zsh" > /dev/null && source ~/.zshrc
   afdsafdsa 2>&1  | grep -e "^bash" > /dev/null && source ~/.bashrc
 }

@@ -84,6 +84,8 @@ cat() {
 # TODO: Omarchy may fail on loading oh-my-posh
 eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
 
+[ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
 # Preferred editor for local and remote sessions
 #
 if [[ -n $SSH_CONNECTION ]]; then
@@ -130,31 +132,39 @@ fi
 
 install_utils() {
   if ! command -v oh-my-posh >/dev/null; then
-    uname -a | grep linux > /dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
+    uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
     uname -a | grep darwin > /dev/null && brew install jandedobbeleer/oh-my-posh/oh-my-posh
   fi
 
   if ! command -v chezmoi >/dev/null; then
-    uname -a | grep linux > /dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
+    uname -a | grep Linux >/dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
     uname -a | grep darwin > /dev/null && brew install chezmoi
 
     sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
   fi
 
   if ! command -v fzf >/dev/null; then
-    uname -a | grep linux > /dev/null \
+    uname -a | grep Linux >/dev/null \
       && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
       && ~/.fzf/install
     uname -a | grep darwin > /dev/null && brew install fzf
   fi
 
   if ! command -v mise >/dev/null; then
-    uname -a | grep linux > /dev/null && curl https://mise.run | sh
+    uname -a | grep Linux >/dev/null && curl https://mise.run | sh
     uname -a | grep darwin > /dev/null && brew install mise
   fi
 
   if ! command -v nvm >/dev/null; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  fi
+
+  if ! command -v nvim >/dev/null; then
+    uname -a | grep Linux >/dev/null \
+      && curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz --output /tmp/nvim-linux-x86_64.tar.gz \
+      && sudo rm -rf /opt/nvim-linux-x86_64 \
+      && sudo tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
+    uname -a | grep darwin > /dev/null && brew install neovim
   fi
 
   if ! command -v uv >/dev/null; then

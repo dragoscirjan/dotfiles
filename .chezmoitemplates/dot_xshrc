@@ -116,19 +116,10 @@ if [ -d "$HOME/.nvm" ]; then
   nvm use $NODE_VERSION
 fi
 
-# export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-# export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
 
-# # bun completions
-# [ -s "/Users/dragosc/.bun/_bun" ] && source "/Users/dragosc/.bun/_bun"
-
-# # bun
-# export BUN_INSTALL="$HOME/.bun"
-# export PATH="$BUN_INSTALL/bin:$PATH"
-
-# . "$HOME/.local/bin/env"
-
-# . "$HOME/.llvmrc"
+# Go
+#
+[ -d $HOME/go/bin ] && export PATH=$HOME/go/bin:$PATH
 
 install_utils() {
   if ! command -v oh-my-posh >/dev/null; then

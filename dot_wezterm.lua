@@ -36,33 +36,33 @@ config.window_background_opacity = 0.9
 -- Key bindings
 --
 config.keys = {
-  -- Tab Navigation
+  -- Tab Navigation (Ctrl+Shift+H/L like Ghostty)
   {
-    key = "RightArrow",
-    mods = SUPER,
+    key = "l",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.ActivateTabRelative(1),
   },
   {
-    key = "LeftArrow",
-    mods = SUPER,
+    key = "h",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.ActivateTabRelative(-1),
   },
 
-  -- Direct tab access (1-9)
-  { key = "1", mods = SUPER, action = wezterm.action.ActivateTab(0) },
-  { key = "2", mods = SUPER, action = wezterm.action.ActivateTab(1) },
-  { key = "3", mods = SUPER, action = wezterm.action.ActivateTab(2) },
-  { key = "4", mods = SUPER, action = wezterm.action.ActivateTab(3) },
-  { key = "5", mods = SUPER, action = wezterm.action.ActivateTab(4) },
-  { key = "6", mods = SUPER, action = wezterm.action.ActivateTab(5) },
-  { key = "7", mods = SUPER, action = wezterm.action.ActivateTab(6) },
-  { key = "8", mods = SUPER, action = wezterm.action.ActivateTab(7) },
-  { key = "9", mods = SUPER, action = wezterm.action.ActivateTab(8) },
+  -- Direct tab access (Ctrl+Shift+1-9 like Ghostty)
+  { key = "1", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(0) },
+  { key = "2", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(1) },
+  { key = "3", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(2) },
+  { key = "4", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(3) },
+  { key = "5", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(4) },
+  { key = "6", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(5) },
+  { key = "7", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(6) },
+  { key = "8", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(7) },
+  { key = "9", mods = "CTRL|SHIFT", action = wezterm.action.ActivateTab(8) },
 
-  -- Tab management
+  -- Tab management (rename tab with Ctrl+Shift+R)
   {
     key = "r",
-    mods = SUPER .. "|SHIFT",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.PromptInputLine({
       description = "Enter new name for tab",
       action = wezterm.action_callback(function(window, pane, line)
@@ -73,42 +73,78 @@ config.keys = {
     }),
   },
 
-  -- Split Panel
+  -- Clipboard (Shift+Insert / Ctrl+Insert like Ghostty)
   {
-    key = "d",
-    mods = SUPER,
+    key = "Insert",
+    mods = "SHIFT",
+    action = wezterm.action.PasteFrom("Clipboard"),
+  },
+  {
+    key = "Insert",
+    mods = "CTRL",
+    action = wezterm.action.CopyTo("Clipboard"),
+  },
+
+  -- Split Panel (Ctrl+Shift+E/O like Ghostty)
+  {
+    key = "e",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
   },
   {
-    key = "d",
-    mods = SUPER .. "|SHIFT",
+    key = "o",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
   },
+
+  -- Split Navigation (Ctrl+Shift+Alt+HJKL like Ghostty)
   {
-    key = "LeftArrow",
-    mods = SUPER .. "|ALT",
+    key = "h",
+    mods = "CTRL|SHIFT|ALT",
     action = wezterm.action.ActivatePaneDirection("Left"),
   },
   {
-    key = "RightArrow",
-    mods = SUPER .. "|ALT",
+    key = "l",
+    mods = "CTRL|SHIFT|ALT",
     action = wezterm.action.ActivatePaneDirection("Right"),
   },
   {
-    key = "DownArrow",
-    mods = SUPER .. "|ALT",
+    key = "j",
+    mods = "CTRL|SHIFT|ALT",
     action = wezterm.action.ActivatePaneDirection("Down"),
   },
   {
-    key = "UpArrow",
-    mods = SUPER .. "|ALT",
+    key = "k",
+    mods = "CTRL|SHIFT|ALT",
     action = wezterm.action.ActivatePaneDirection("Up"),
+  },
+
+  -- Resize Split Panels (Alt+Shift+HJKL like Ghostty)
+  {
+    key = "h",
+    mods = "ALT|SHIFT",
+    action = wezterm.action.AdjustPaneSize({ "Left", 5 }),
+  },
+  {
+    key = "l",
+    mods = "ALT|SHIFT",
+    action = wezterm.action.AdjustPaneSize({ "Right", 5 }),
+  },
+  {
+    key = "j",
+    mods = "ALT|SHIFT",
+    action = wezterm.action.AdjustPaneSize({ "Down", 5 }),
+  },
+  {
+    key = "k",
+    mods = "ALT|SHIFT",
+    action = wezterm.action.AdjustPaneSize({ "Up", 5 }),
   },
 
   -- Quick shell launchers
   {
     key = "t",
-    mods = SUPER .. "|SHIFT",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.ShowLauncher,
   },
 }

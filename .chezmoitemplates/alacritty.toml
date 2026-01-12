@@ -73,6 +73,9 @@ bindings = [
   { key = "V", mods = "Command", action = "Paste" },
   { key = "C", mods = "Control|Shift", action = "Copy" },
   { key = "V", mods = "Control|Shift", action = "Paste" },
+  # Clipboard with Insert key (like Ghostty)
+  { key = "Insert", mods = "Shift", action = "Paste" },
+  { key = "Insert", mods = "Control", action = "Copy" },
 
   # Font size adjustment
   { key = "Plus", mods = "Command", action = "IncreaseFontSize" },

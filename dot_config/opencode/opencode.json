@@ -1,0 +1,117 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "memory_json": {
+      "type": "local",
+      "command": [
+        "mcp-server-memory"
+      ],
+      "environment": {
+        "MEMORY_FILE_PATH": ".memory.jsonl"
+      },
+      "enabled": true
+    },
+    "memory_libsql": {
+      "type": "local",
+      "command": [
+        "mcp-memory-libsql"
+      ],
+      "environment": {
+        "LIBSQL_URL": "file:.memory.db"
+      },
+      "enabled": false
+    },
+    "sequential_thinking": {
+      "type": "local",
+      "command": [
+        "mcp-server-sequential-thinking"
+      ],
+      "enabled": true
+    },
+    "typescript_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "typescript-language-server",
+        "--",
+        "--stdio"
+      ],
+      "enabled": true
+    },
+    "python_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "pyright-langserver",
+        "--",
+        "--stdio"
+      ],
+      "enabled": true
+    },
+    "go_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "gopls"
+      ],
+      "enabled": true
+    },
+    "rust_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "rust-analyzer"
+      ],
+      "enabled": true
+    },
+    "cpp_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "clangd",
+        "--",
+        "--background-index"
+      ],
+      "enabled": true
+    },
+    "bash_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "bash-language-server",
+        "--",
+        "start"
+      ],
+      "enabled": true
+    },
+    "zig_lsp": {
+      "type": "local",
+      "command": [
+        "mcp-language-server",
+        "--workspace",
+        ".",
+        "--lsp",
+        "zls"
+      ],
+      "enabled": true
+    }
+  }
+}

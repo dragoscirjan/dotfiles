@@ -11,13 +11,15 @@ cd() {
   fi
 }
 
+{{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
 [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
 [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] && source $HOME/.autojump/etc/profile.d/autojump.sh
+{{ end }}
 
 # Override cat to use bat (-> https://github.com/sharkdp/bat) if available
 #
 cat() {
-  local batcmd=""
+  local batcmd="- end"
   if [ -z "$NO_BAT" ]; then
     if command -v bat >/dev/null 2>&1; then
       batcmd="bat"
@@ -118,6 +120,15 @@ fi
 [ -d $HOME/go/bin ] && export PATH=$HOME/go/bin:$PATH
 
 install_utils() {
+{{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
+  [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] || brew install autojump
+  [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] {
+    git clone https://github.com/wting/autojump.git /tmp/autojump && \
+      cd /tmp/autojump && \
+      ./install.py
+  }
+
+{{ end }}
   if ! command -v oh-my-posh >/dev/null; then
     uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
     uname -a | grep darwin > /dev/null && brew install jandedobbeleer/oh-my-posh/oh-my-posh

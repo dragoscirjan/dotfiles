@@ -1,8 +1,5 @@
 
-
 export PATH=$HOME/.local/bin:$HOME/bin:$PATH
-
-
 
 # Override cd to
 # - auto-use nvm when entering directories with .nvmrc
@@ -16,7 +13,6 @@ cd() {
 
 [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
 [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] && source $HOME/.autojump/etc/profile.d/autojump.sh
-
 
 # Override cat to use bat (-> https://github.com/sharkdp/bat) if available
 #
@@ -104,7 +100,7 @@ if [ -d "$HOME/.nvm" ]; then
   # This loads nvm bash_completion
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-  export NODE_VERSION="lts/jod"
+  export NODE_VERSION="lts/krypton"
 
   # Check if Node.js is installed and matches the desired version
   INSTALLED_VERSION=$(nvm version $NODE_VERSION)

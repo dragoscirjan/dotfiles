@@ -4,7 +4,9 @@
     "memory_json": {
       "type": "local",
       "command": [
-        "mcp-server-memory"
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory"
       ],
       "environment": {
         "MEMORY_FILE_PATH": ".memory.jsonl"
@@ -14,6 +16,8 @@
     "memory_libsql": {
       "type": "local",
       "command": [
+        "npx",
+        "-y",
         "mcp-memory-libsql"
       ],
       "environment": {
@@ -24,92 +28,9 @@
     "sequential_thinking": {
       "type": "local",
       "command": [
-        "mcp-server-sequential-thinking"
-      ],
-      "enabled": true
-    },
-    "typescript_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "typescript-language-server",
-        "--",
-        "--stdio"
-      ],
-      "enabled": true
-    },
-    "python_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "pyright-langserver",
-        "--",
-        "--stdio"
-      ],
-      "enabled": true
-    },
-    "go_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "gopls"
-      ],
-      "enabled": true
-    },
-    "rust_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "rust-analyzer"
-      ],
-      "enabled": true
-    },
-    "cpp_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "clangd",
-        "--",
-        "--background-index"
-      ],
-      "enabled": true
-    },
-    "bash_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "bash-language-server",
-        "--",
-        "start"
-      ],
-      "enabled": true
-    },
-    "zig_lsp": {
-      "type": "local",
-      "command": [
-        "mcp-language-server",
-        "--workspace",
-        ".",
-        "--lsp",
-        "zls"
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
       ],
       "enabled": true
     }

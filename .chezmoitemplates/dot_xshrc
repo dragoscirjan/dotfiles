@@ -122,7 +122,7 @@ fi
 install_utils() {
 {{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
   [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] || brew install autojump
-  [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] {
+  [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] || {
     git clone https://github.com/wting/autojump.git /tmp/autojump && \
       cd /tmp/autojump && \
       ./install.py
@@ -143,6 +143,7 @@ install_utils() {
 
   if ! command -v fzf >/dev/null; then
     uname -a | grep Linux >/dev/null \
+      && [ ! -d ~/.fzf ] \
       && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
       && ~/.fzf/install
     uname -a | grep darwin > /dev/null && brew install fzf

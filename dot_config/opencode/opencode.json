@@ -36,6 +36,19 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ],
       "enabled": true
+    },
+    "fastcode": {
+      "type": "local",
+      "command": [
+        "{env:FASTCODE_PATH}/.venv/bin/python",
+        "{env:FASTCODE_PATH}/mcp_server.py"
+      ],
+      "environment": {
+        "OPENAI_API_KEY": "{env:FASTCODE_API_KEY}",
+        "MODEL": "{env:FASTCODE_MODEL}",
+        "BASE_URL": "{env:FASTCODE_BASE_URL}"
+      },
+      "enabled": false
     }
   }
 }

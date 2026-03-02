@@ -1,0 +1,117 @@
+{{- if and (eq .chezmoi.os "linux") (lookPath "kwriteconfig6") }}
+#!/usr/bin/env bash
+# Configure kwin-rectangle: enable the plugin, apply shortcuts, and reload KWin.
+# Only the rectangle-specific keys are managed here; the rest of kwinrc and
+# kglobalshortcutsrc are left untouched so per-machine settings are preserved.
+
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# 1. Enable the kwin-rectangle plugin
+# ---------------------------------------------------------------------------
+kwriteconfig6 --file kwinrc --group Plugins --key kwin-rectangleEnabled true
+echo "kwin-rectangle: plugin enabled"
+
+# ---------------------------------------------------------------------------
+# 2. Rectangle shortcuts  (written to kglobalshortcutsrc, [kwin] group)
+#    Format: "<active shortcut>,<default shortcut>,<friendly name>"
+#    "none" means no binding.
+# ---------------------------------------------------------------------------
+kw() {
+    kwriteconfig6 --file kglobalshortcutsrc --group kwin --key "$1" "$2"
+}
+
+echo "kwin-rectangle: applying shortcuts..."
+
+kw "Rectangle: Center"                              "Meta+Ctrl+C,none,Rectangle: Center"
+kw "Rectangle: Maximize"                            "Meta+Ctrl+Return,none,Rectangle: Maximize"
+kw "Rectangle: Maximize: Almost"                    "Meta+Ctrl+Shift+Return,none,Rectangle: Maximize: Almost"
+kw "Rectangle: Maximize: Height"                    "Meta+Ctrl+Alt+Shift+Up,none,Rectangle: Maximize: Height"
+kw "Rectangle: Maximize: Width"                     "Meta+Ctrl+Alt+Shift+Right,none,Rectangle: Maximize: Width"
+
+# Half
+kw "Rectangle: Half: (1) Center (Horizontal)"      "Meta+Ctrl+Shift+V,none,Rectangle: Half: (1) Center (Horizontal)"
+kw "Rectangle: Half: (1) Center (Vertical)"        "Meta+Ctrl+Shift+C,none,Rectangle: Half: (1) Center (Vertical)"
+kw "Rectangle: Half: (2) Left"                     "none,none,Rectangle: Half: (2) Left"
+kw "Rectangle: Half: (2) Right"                    "none,none,Rectangle: Half: (2) Right"
+kw "Rectangle: Half: (3) Bottom"                   "Meta+Ctrl+Shift+B,none,Rectangle: Half: (3) Bottom"
+kw "Rectangle: Half: (3) Top"                      "Meta+Ctrl+Shift+T,none,Rectangle: Half: (3) Top"
+
+# Third
+kw "Rectangle: Third: (1) First"                   "Meta+Ctrl+D,none,Rectangle: Third: (1) First"
+kw "Rectangle: Third: (2) Second"                  "Meta+Ctrl+F,none,Rectangle: Third: (2) Second"
+kw "Rectangle: Third: (3) Third"                   "Meta+Ctrl+G,none,Rectangle: Third: (3) Third"
+
+# Two Thirds
+kw "Rectangle: Two Thirds: (1) Left"               "Meta+Ctrl+E,none,Rectangle: Two Thirds: (1) Left"
+kw "Rectangle: Two Thirds: (2) Center"             "none,none,Rectangle: Two Thirds: (2) Center"
+kw "Rectangle: Two Thirds: (3) Right"              "Meta+Ctrl+T,none,Rectangle: Two Thirds: (3) Right"
+
+# Three Fourths
+kw "Rectangle: Three Fourths: (1) Left"            "Meta+Ctrl+Shift+N,none,Rectangle: Three Fourths: (1) Left"
+kw "Rectangle: Three Fourths: (2) Right"           "Meta+Ctrl+Shift+M,none,Rectangle: Three Fourths: (2) Right"
+
+# Fourth
+kw "Rectangle: Fourth: (1) First"                  "Meta+Ctrl+V,none,Rectangle: Fourth: (1) First"
+kw "Rectangle: Fourth: (2) Second"                 "Meta+Ctrl+B,none,Rectangle: Fourth: (2) Second"
+kw "Rectangle: Fourth: (3) Third"                  "Meta+Ctrl+N,none,Rectangle: Fourth: (3) Third"
+kw "Rectangle: Fourth: (4) Fourth"                 "Meta+Ctrl+M,none,Rectangle: Fourth: (4) Fourth"
+
+# Quarter
+kw "Rectangle: Quarter: (1) Top Left"              "Meta+Ctrl+U,none,Rectangle: Quarter: (1) Top Left"
+kw "Rectangle: Quarter: (2) Top Right"             "Meta+Ctrl+I,none,Rectangle: Quarter: (2) Top Right"
+kw "Rectangle: Quarter: (3) Bottom Left"           "Meta+Ctrl+J,none,Rectangle: Quarter: (3) Bottom Left"
+kw "Rectangle: Quarter: (4) Bottom Right"          "Meta+Ctrl+K,none,Rectangle: Quarter: (4) Bottom Right"
+kw "Rectangle: Quarter: (5) Centered"              "Meta+Ctrl+Alt+C,none,Rectangle: Quarter: (5) Centered"
+
+# Sixth
+kw "Rectangle: Sixth: (1) Top Left"                "Meta+Ctrl+Shift+U,none,Rectangle: Sixth: (1) Top Left"
+kw "Rectangle: Sixth: (2) Top Center"              "Meta+Ctrl+Shift+I,none,Rectangle: Sixth: (2) Top Center"
+kw "Rectangle: Sixth: (3) Top Right"               "Meta+Ctrl+Shift+O,none,Rectangle: Sixth: (3) Top Right"
+kw "Rectangle: Sixth: (4) Bottom Left"             "Meta+Ctrl+Shift+J,none,Rectangle: Sixth: (4) Bottom Left"
+kw "Rectangle: Sixth: (5) Bottom Center"           "Meta+Ctrl+Shift+K,none,Rectangle: Sixth: (5) Bottom Center"
+kw "Rectangle: Sixth: (6) Bottom Right"            "Meta+Ctrl+Shift+L,none,Rectangle: Sixth: (6) Bottom Right"
+
+# Ninth
+kw "Rectangle: Ninth: (1) Top Left"                "Meta+Ctrl+Alt+U,none,Rectangle: Ninth: (1) Top Left"
+kw "Rectangle: Ninth: (2) Top Center"              "Meta+Ctrl+Alt+I,none,Rectangle: Ninth: (2) Top Center"
+kw "Rectangle: Ninth: (3) Top Right"               "Meta+Ctrl+Alt+O,none,Rectangle: Ninth: (3) Top Right"
+kw "Rectangle: Ninth: (4) Middle Left"             "Meta+Ctrl+Alt+J,none,Rectangle: Ninth: (4) Middle Left"
+kw "Rectangle: Ninth: (5) Middle Center"           "Meta+Ctrl+Alt+K,none,Rectangle: Ninth: (5) Middle Center"
+kw "Rectangle: Ninth: (6) Middle Right"            "Meta+Ctrl+Alt+L,none,Rectangle: Ninth: (6) Middle Right"
+kw "Rectangle: Ninth: (7) Bottom Left"             "Meta+Ctrl+Alt+N,none,Rectangle: Ninth: (7) Bottom Left"
+kw "Rectangle: Ninth: (8) Bottom Center"           "Meta+Ctrl+Alt+M,none,Rectangle: Ninth: (8) Bottom Center"
+kw "Rectangle: Ninth: (9) Bottom Right"            "Meta+Ctrl+Alt+\\,,none,Rectangle: Ninth: (9) Bottom Right"
+
+# Move (numpad-style)
+kw "Rectangle: Move: (1) Bottom Left"              "Meta+Ctrl+Alt+1,none,Rectangle: Move: (1) Bottom Left"
+kw "Rectangle: Move: (2) Bottom"                   "Meta+Ctrl+Alt+2,none,Rectangle: Move: (2) Bottom"
+kw "Rectangle: Move: (3) Bottom Right"             "Meta+Ctrl+Alt+3,none,Rectangle: Move: (3) Bottom Right"
+kw "Rectangle: Move: (4) Left"                     "Meta+Ctrl+Alt+4,none,Rectangle: Move: (4) Left"
+kw "Rectangle: Move: (5) Right"                    "Meta+Ctrl+Alt+6,none,Rectangle: Move: (5) Right"
+kw "Rectangle: Move: (6) Top Left"                 "Meta+Ctrl+Alt+7,none,Rectangle: Move: (6) Top Left"
+kw "Rectangle: Move: (7) Top"                      "Meta+Ctrl+Alt+8,none,Rectangle: Move: (7) Top"
+kw "Rectangle: Move: (8) Top Right"                "Meta+Ctrl+Alt+9,none,Rectangle: Move: (8) Top Right"
+
+# Stretch
+kw "Rectangle: Stretch: (1) Bottom"                "Meta+Ctrl+Alt+Down,none,Rectangle: Stretch: (1) Bottom"
+kw "Rectangle: Stretch: (1) Top"                   "Meta+Ctrl+Alt+Up,none,Rectangle: Stretch: (1) Top"
+kw "Rectangle: Stretch: (2) Left"                  "Meta+Ctrl+Alt+Left,none,Rectangle: Stretch: (2) Left"
+kw "Rectangle: Stretch: (2) Right"                 "Meta+Ctrl+Alt+Right,none,Rectangle: Stretch: (2) Right"
+
+# Stretch Step (numpad-style)
+kw "Rectangle: Stretch: Step: (1) Bottom Left"     "Meta+Ctrl+1,none,Rectangle: Stretch: Step: (1) Bottom Left"
+kw "Rectangle: Stretch: Step: (2) Bottom"          "Meta+Ctrl+2,none,Rectangle: Stretch: Step: (2) Bottom"
+kw "Rectangle: Stretch: Step: (3) Bottom Right"    "Meta+Ctrl+3,none,Rectangle: Stretch: Step: (3) Bottom Right"
+kw "Rectangle: Stretch: Step: (4) Left"            "Meta+Ctrl+4,none,Rectangle: Stretch: Step: (4) Left"
+kw "Rectangle: Stretch: Step: (5) Right"           "Meta+Ctrl+6,none,Rectangle: Stretch: Step: (5) Right"
+kw "Rectangle: Stretch: Step: (6) Top Left"        "Meta+Ctrl+7,none,Rectangle: Stretch: Step: (6) Top Left"
+kw "Rectangle: Stretch: Step: (7) Top"             "Meta+Ctrl+8,none,Rectangle: Stretch: Step: (7) Top"
+kw "Rectangle: Stretch: Step: (8) Top Right"       "Meta+Ctrl+9,none,Rectangle: Stretch: Step: (8) Top Right"
+
+# ---------------------------------------------------------------------------
+# 3. Reload KWin so changes take effect immediately
+# ---------------------------------------------------------------------------
+qdbus org.kde.KWin /KWin reconfigure
+echo "kwin-rectangle: KWin reloaded"
+{{- end }}

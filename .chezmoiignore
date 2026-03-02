@@ -14,6 +14,14 @@ Library/**
 
 {{ if eq .chezmoi.os "linux" }}
 Library/**
+# Managed surgically via run_onchange_after_configure-kwin.sh (kwriteconfig6)
+.config/kwinrc
+.config/kglobalshortcutsrc
+{{ end }}
+
+{{ if stat (joinPath .chezmoi.homeDir ".config/omarchy") }}
+# omarchy manages KWin itself; skip kwin-rectangle setup
+.chezmoiscripts/configure-kwin.sh
 {{ end }}
 
 {{ if eq .chezmoi.os "darwin" }}

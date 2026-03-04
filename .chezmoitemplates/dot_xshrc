@@ -1,6 +1,8 @@
 
 export PATH=$HOME/.local/bin:$HOME/bin:$PATH
 
+[ -d $HOME/.cargo/bin ] && export PATH=$HOME/.cargo/bin:$PATH
+
 # Override cd to
 # - auto-use nvm when entering directories with .nvmrc
 #
@@ -8,6 +10,34 @@ cd() {
   builtin cd "$@"
   if [ -d "$HOME/.nvm" ] && [ -f .nvmrc ]; then
     nvm use
+  fi
+}
+
+if command -v exa >/dev/null 2>&1; then
+  alias ls='exa --icons'
+fi
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons'
+fi
+
+# it appears NixOs doesn't like it
+#l() {
+#  if command -v exa >/dev/null 2>&1; then
+#    exa --icons "$@"
+#  else
+#    ls "$@"
+#  fi
+#}
+
+la() {
+  if command -v exa >/dev/null 2>&1; then
+    exa --icons -la "$@"
+  else
+    if command -v eza >/dev/null 2>&1; then
+      eza --icons -la "$@"
+    else
+      ls -la "$@"
+    fi
   fi
 }
 
@@ -89,7 +119,14 @@ eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='nvim'
+  if command -v nvim >/dev/null; then
+    export EDITOR='nvim'
+    v() {
+        nvim "$@"
+    }
+  else
+    export EDITOR='vim'
+  fi
 fi
 
 # Nvm
@@ -114,6 +151,49 @@ if [ -d "$HOME/.nvm" ]; then
   nvm use $NODE_VERSION
 fi
 
+# Npx
+#
+if command -v npx >/dev/null 2>&1; then
+  npx() {
+    command npx -y "$@"
+  }
+
+  ai_agent() {
+    npx ${1:-opencode-ai}@latest "$@"
+  }
+
+  claude() {
+    if ! command -v claude >/dev/null 2>&1; then
+      curl -fsSL https://claude.ai/install.sh | bash
+    fi
+    if [ -n "$UPDATE_CLAUDE" ]; then
+      curl -fsSL https://claude.ai/install.sh | bash
+    fi
+
+    command claude "$@"
+  }
+
+  codex() {
+    ai_agent @openai/codex "$@"
+  }
+
+  gemini() {
+    ai_agent @google/gemini-cli "$@"
+  }
+
+  kilo() {
+     ai_agent @kilocode/cli "$@"
+  }
+
+  opencode() {
+    ai_agent "$@"
+  }
+
+  oc() {
+    opencode "$@"
+  }
+fi
+
 
 # Go
 #
@@ -131,12 +211,12 @@ install_utils() {
 {{ end }}
   if ! command -v oh-my-posh >/dev/null; then
     uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
-    uname -a | grep darwin > /dev/null && brew install jandedobbeleer/oh-my-posh/oh-my-posh
+    uname -a | grep darwin >/dev/null 2>&1 && brew install jandedobbeleer/oh-my-posh/oh-my-posh
   fi
 
   if ! command -v chezmoi >/dev/null; then
     uname -a | grep Linux >/dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
-    uname -a | grep darwin > /dev/null && brew install chezmoi
+    uname -a | grep darwin >/dev/null 2>&1 && brew install chezmoi
 
     sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
   fi
@@ -146,12 +226,12 @@ install_utils() {
       && [ ! -d ~/.fzf ] \
       && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
       && ~/.fzf/install
-    uname -a | grep darwin > /dev/null && brew install fzf
+    uname -a | grep darwin >/dev/null 2>&1 && brew install fzf
   fi
 
   if ! command -v mise >/dev/null; then
     uname -a | grep Linux >/dev/null && curl https://mise.run | sh
-    uname -a | grep darwin > /dev/null && brew install mise
+    uname -a | grep darwin >/dev/null 2>&1 && brew install mise
   fi
 
   if ! command -v nvm >/dev/null; then
@@ -163,7 +243,7 @@ install_utils() {
       && curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz --output /tmp/nvim-linux-x86_64.tar.gz \
       && sudo rm -rf /opt/nvim-linux-x86_64 \
       && sudo tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
-    uname -a | grep darwin > /dev/null && brew install neovim
+    uname -a | grep darwin >/dev/null 2>&1 && brew install neovim
   fi
 
   if ! command -v uv >/dev/null; then
@@ -172,9 +252,9 @@ install_utils() {
 
   if ! command -v task >/dev/null; then
     uname -a | grep Linux >/dev/null && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin 
-    uname -a | grep darwin > /dev/null && brew install task
+    uname -a | grep darwin >/dev/null 2>&1 && brew install task
   fi
 
-  afdsafdsa 2>&1  | grep -e "^zsh" > /dev/null && source ~/.zshrc
-  afdsafdsa 2>&1  | grep -e "^bash" > /dev/null && source ~/.bashrc
+  afdsafdsa 2>&1 | grep -e "^zsh" >/dev/null 2>&1 && source ~/.zshrc
+  afdsafdsa 2>&1 | grep -e "^bash" >/dev/null 2>&1 && source ~/.bashrc
 }

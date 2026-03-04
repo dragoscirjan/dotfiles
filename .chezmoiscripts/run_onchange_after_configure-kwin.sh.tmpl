@@ -1,5 +1,5 @@
-{{- if and (eq .chezmoi.os "linux") (lookPath "kwriteconfig6") }}
 #!/usr/bin/env bash
+{{- if and (eq .chezmoi.os "linux") (lookPath "kwriteconfig6") }}
 # Configure kwin-rectangle: enable the plugin, apply shortcuts, and reload KWin.
 # Only the rectangle-specific keys are managed here; the rest of kwinrc and
 # kglobalshortcutsrc are left untouched so per-machine settings are preserved.
@@ -7,13 +7,32 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# 1. Enable the kwin-rectangle plugin
+# 1. Install the kwin-rectangle plugin
+# ---------------------------------------------------------------------------
+KWIN_RECTANGLE=1
+[ ! -d ~/.local/share/kwin/kwin-rectangle ] \
+  && KWIN_RECTANGLE=1
+
+[ -n KWIN_RECTANGLE ] \
+  && KWIN_RECTANGLE=0 \
+  && rm -rf ~/.local/share/kwin/kwin-rectangle
+
+[ $KWIN_RECTANGLE -eq 0 ] \
+  && {
+    cd /tmp
+    rm -rf kwin-rectangle
+    git clone https://github.com/acristoffers/kwin-rectangle
+    cd kwin-rectangle && bash ./install.sh
+  }
+
+# ---------------------------------------------------------------------------
+# 2. Enable the kwin-rectangle plugin
 # ---------------------------------------------------------------------------
 kwriteconfig6 --file kwinrc --group Plugins --key kwin-rectangleEnabled true
 echo "kwin-rectangle: plugin enabled"
 
 # ---------------------------------------------------------------------------
-# 2. Rectangle shortcuts  (written to kglobalshortcutsrc, [kwin] group)
+# 3. Rectangle shortcuts  (written to kglobalshortcutsrc, [kwin] group)
 #    Format: "<active shortcut>,<default shortcut>,<friendly name>"
 #    "none" means no binding.
 # ---------------------------------------------------------------------------
@@ -110,7 +129,7 @@ kw "Rectangle: Stretch: Step: (7) Top"             "Meta+Ctrl+8,none,Rectangle: 
 kw "Rectangle: Stretch: Step: (8) Top Right"       "Meta+Ctrl+9,none,Rectangle: Stretch: Step: (8) Top Right"
 
 # ---------------------------------------------------------------------------
-# 3. Reload KWin so changes take effect immediately
+# 4. Reload KWin so changes take effect immediately
 # ---------------------------------------------------------------------------
 qdbus org.kde.KWin /KWin reconfigure
 echo "kwin-rectangle: KWin reloaded"

@@ -7,7 +7,7 @@ export PATH=$HOME/.local/bin:$HOME/bin:$PATH
 # - auto-use nvm when entering directories with .nvmrc
 #
 cd() {
-  builtin cd "$@"
+  builtin cd $@
   if [ -d "$HOME/.nvm" ] && [ -f .nvmrc ]; then
     nvm use
   fi
@@ -23,20 +23,20 @@ fi
 # it appears NixOs doesn't like it
 #l() {
 #  if command -v exa >/dev/null 2>&1; then
-#    exa --icons "$@"
+#    exa --icons $@
 #  else
-#    ls "$@"
+#    ls $@
 #  fi
 #}
 
 la() {
   if command -v exa >/dev/null 2>&1; then
-    exa --icons -la "$@"
+    exa --icons -la $@
   else
     if command -v eza >/dev/null 2>&1; then
-      eza --icons -la "$@"
+      eza --icons -la $@
     else
-      ls -la "$@"
+      ls -la $@
     fi
   fi
 }
@@ -103,7 +103,7 @@ cat() {
     done
     BAT_STYLE="plain" BAT_PAGING="never" "$batcmd" "${bat_args[@]}" -- "${files[@]}"
   else
-    command cat "$@"
+    command cat $@
   fi
 }
 
@@ -122,12 +122,16 @@ else
   if command -v nvim >/dev/null; then
     export EDITOR='nvim'
     v() {
-        nvim "$@"
+        nvim $@
     }
   else
     export EDITOR='vim'
   fi
 fi
+
+t() {
+  task $@
+}
 
 # Nvm
 #
@@ -155,11 +159,11 @@ fi
 #
 if command -v npx >/dev/null 2>&1; then
   npx() {
-    command npx -y "$@"
+    command npx -y $@
   }
 
   ai_agent() {
-    npx ${1:-opencode-ai}@latest "$@"
+    npx ${1:-opencode-ai}@latest $@
   }
 
   claude() {
@@ -170,27 +174,27 @@ if command -v npx >/dev/null 2>&1; then
       curl -fsSL https://claude.ai/install.sh | bash
     fi
 
-    command claude "$@"
+    command claude $@
   }
 
   codex() {
-    ai_agent @openai/codex "$@"
+    ai_agent @openai/codex $@
   }
 
   gemini() {
-    ai_agent @google/gemini-cli "$@"
+    ai_agent @google/gemini-cli $@
   }
 
   kilo() {
-     ai_agent @kilocode/cli "$@"
+     ai_agent @kilocode/cli $@
   }
 
   opencode() {
-    ai_agent "$@"
+    ai_agent $@
   }
 
   oc() {
-    opencode "$@"
+    opencode $@
   }
 fi
 

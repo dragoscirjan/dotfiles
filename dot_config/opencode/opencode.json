@@ -81,6 +81,24 @@
       },
       "enabled": false
     },
+    "cvs_gitlab": {
+      "type": "remote",
+      "url": "https://{env:GITLAB_URL}/api/v4/mcp",
+      "enabled": false
+    },
+    "cvs_forgejo": {
+      "type": "local",
+      "command": [
+        "forgejo-mcp",
+        "--transport",
+        "stdio"
+      ],
+      "environment": {
+        "FORGEJO_URL": "{env:FORGEJO_URL}",
+        "FORGEJO_ACCESS_TOKEN": "{env:FORGEJO_ACCESS_TOKEN}"
+      },
+      "enabled": false
+    },
     "docs_context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
@@ -99,7 +117,7 @@
         "@modelcontextprotocol/server-memory"
       ],
       "environment": {
-        "MEMORY_FILE_PATH": ".memory.jsonl"
+        "MEMORY_FILE_PATH": "{env:PROJECT_PATH}/.memory.jsonl"
       },
       "enabled": true
     },
@@ -111,7 +129,7 @@
         "mcp-memory-libsql"
       ],
       "environment": {
-        "LIBSQL_URL": "file:.memory.db"
+        "LIBSQL_URL": "file:{env:PROJECT_PATH}/.memory.db"
       },
       "enabled": false
     },

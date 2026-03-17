@@ -1,6 +1,6 @@
 ---
-description: Multi-lens code review
-agent: general
+description: Code review on current diff
+agent: code-reviewer
 ---
 
 Run a comprehensive code review on the current diff.
@@ -8,14 +8,8 @@ Run a comprehensive code review on the current diff.
 ## Steps
 
 1. Get the diff: `git diff main...HEAD`
-
-2. Invoke ALL reviewers in parallel:
-   - **@review-code** - Always runs (generic quality, security, design)
-   - **@review-frontend** - For `.tsx`, `.jsx`, `.vue`, `.svelte`, `.css`, `.scss`, and files in `components/`, `pages/`, `ui/`
-   - **@review-backend** - For `.go`, `.py`, `.rs`, `.java`, `.rb`, and `.ts`/`.js` in `api/`, `server/`, `services/`
-   - **@review-infra** - For `.github/`, `.gitlab-ci*`, `Dockerfile*`, `docker-compose*`, `*.tf`, `ansible/`, `k8s/`, `helm/`
-
-3. Synthesize findings into one report grouped by category, then severity:
+2. Review all changes for quality, security, performance, and correctness
+3. Present findings grouped by category, then severity:
 
 ```
 ## Security

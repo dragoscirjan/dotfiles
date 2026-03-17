@@ -1,6 +1,6 @@
 ---
 description: Run tests with coverage
-agent: general
+agent: tester
 ---
 
 Run tests with coverage in "$ARGUMENTS" (or current directory).

@@ -157,44 +157,76 @@ fi
 
 # Npx
 #
+warn() {
+  local YELLOW='\033[1;33m'
+  local NC='\033[0m'
+  echo -e "${YELLOW}⚠  $*${NC}" >&2
+}
+
 if command -v npx >/dev/null 2>&1; then
   npx() {
     command npx -y $@
   }
-
   ai_agent() {
-    npx ${1:-opencode-ai}@latest $@
-  }
+      # Browser MCP (playwright/puppeteer)
+      [ -z "$BROWSER_PATH" ] && warn "'BROWSER_PATH' is not set. Browser MCP (Playwright/Puppeteer) will not work."
 
+      # CVS: GitHub
+      [ -z "$GITHUB_TOKEN" ] && warn "'GITHUB_TOKEN' is not set. GitHub MCP will not work."
+
+      # # CVS: GitLab
+      # [ -z "$GITLAB_URL" ] && warn "'GITLAB_URL' is not set. GitLab MCP will not work."
+
+      # # CVS: Forgejo
+      # [ -z "$FORGEJO_URL" ] && warn "'FORGEJO_URL' is not set. Forgejo MCP will not work."
+      # [ -z "$FORGEJO_ACCESS_TOKEN" ] && warn "'FORGEJO_ACCESS_TOKEN' is not set. Forgejo MCP will not work."
+
+      # # Code Index: CocoIndex
+      # [ -z "$COCOINDEX_PATH" ] && warn "'COCOINDEX_PATH' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_HOST" ] && warn "'COCOINDEX_DB_HOST' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_PORT" ] && warn "'COCOINDEX_DB_PORT' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_NAME" ] && warn "'COCOINDEX_DB_NAME' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_USER" ] && warn "'COCOINDEX_DB_USER' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_PASSWORD" ] && warn "'COCOINDEX_DB_PASSWORD' is not set. CocoIndex MCP will not work."
+
+      # # Code Index: FastCode
+      # [ -z "$FASTCODE_PATH" ] && warn "'FASTCODE_PATH' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_API_KEY" ] && warn "'FASTCODE_API_KEY' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_MODEL" ] && warn "'FASTCODE_MODEL' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_BASE_URL" ] && warn "'FASTCODE_BASE_URL' is not set. FastCode MCP will not work."
+
+      # # Web Crawl: Tavily
+      # [ -z "$TAVILY_API_KEY" ] && warn "'TAVILY_API_KEY' is not set. Tavily MCP will not work."
+
+      # # Web Crawl: Firecrawl
+      # [ -z "$FIRECRAWL_API_KEY" ] && warn "'FIRECRAWL_API_KEY' is not set. Firecrawl MCP will not work."
+
+      export PROJECT_PATH="$(pwd)"
+      npx "${1:-opencode-ai}@latest" "${@:2}"
+  }
   claude() {
-    if ! command -v claude >/dev/null 2>&1; then
-      curl -fsSL https://claude.ai/install.sh | bash
-    fi
-    if [ -n "$UPDATE_CLAUDE" ]; then
-      curl -fsSL https://claude.ai/install.sh | bash
-    fi
-
-    command claude $@
+      if ! command -v claude >/dev/null 2>&1; then
+          curl -fsSL https://claude.ai/install.sh | bash
+      fi
+      if [ -n "$UPDATE_CLAUDE" ]; then
+          curl -fsSL https://claude.ai/install.sh | bash
+      fi
+      command claude "$@"
   }
-
   codex() {
-    ai_agent @openai/codex $@
+      ai_agent @openai/codex "$@"
   }
-
   gemini() {
-    ai_agent @google/gemini-cli $@
+      ai_agent @google/gemini-cli "$@"
   }
-
   kilo() {
-     ai_agent @kilocode/cli $@
+      ai_agent @kilocode/cli "$@"
   }
-
   opencode() {
-    ai_agent $@
+      ai_agent opencode-ai "$@"
   }
-
   oc() {
-    opencode $@
+      opencode "$@"
   }
 fi
 

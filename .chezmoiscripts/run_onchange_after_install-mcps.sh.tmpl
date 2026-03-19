@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+{{- if ne .chezmoi.os "windows" }}
 # Install MCP servers and LSP tools.
 # Skips sections whose runtime (go / npm) is not available, with a warning.
 
@@ -33,3 +34,4 @@ if command -v npm &>/dev/null; then
 else
     warn "npm not found — skipping Node.js LSPs and MCP servers"
 fi
+{{- end }}

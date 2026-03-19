@@ -1,0 +1,36 @@
+# Install MCP servers and LSP tools.
+# Skips sections whose runtime (go / npm) is not available, with a warning.
+{{- if eq .chezmoi.os "windows" }}
+
+$ErrorActionPreference = "Continue"
+
+function Warn($msg) { Write-Warning $msg }
+
+# ---------------------------------------------------------------------------
+# Go-based tools  (mcp-language-server, gopls)
+# ---------------------------------------------------------------------------
+if (Get-Command go -ErrorAction SilentlyContinue) {
+    Write-Host "mcps: installing Go-based tools..."
+    go install github.com/isaacphi/mcp-language-server@latest
+    go install golang.org/x/tools/gopls@v0.18.1
+    Write-Host "mcps: Go-based tools installed"
+} else {
+    Warn "go not found — skipping mcp-language-server and gopls"
+}
+
+# ---------------------------------------------------------------------------
+# Node.js-based tools  (LSPs + MCP servers)
+# ---------------------------------------------------------------------------
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    Write-Host "mcps: installing Node.js-based LSP tools..."
+    npm install -g typescript typescript-language-server pyright bash-language-server
+    Write-Host "mcps: installing MCP servers..."
+    npm install -g `
+        @modelcontextprotocol/server-memory `
+        @modelcontextprotocol/server-sequential-thinking `
+        mcp-memory-libsql
+    Write-Host "mcps: Node.js tools and MCP servers installed"
+} else {
+    Warn "npm not found — skipping Node.js LSPs and MCP servers"
+}
+{{- end }}

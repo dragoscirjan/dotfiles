@@ -133,6 +133,12 @@ t() {
   task $@
 }
 
+# Bun
+#
+if [ -f $HOME/.bun/bin/bun ]; then
+  PATH="$HOME/.bun/bin/bun:$PATH"
+fi
+
 # Nvm
 #
 if [ -d "$HOME/.nvm" ]; then

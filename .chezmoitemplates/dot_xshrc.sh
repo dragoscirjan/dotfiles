@@ -1,0 +1,307 @@
+
+export PATH=$HOME/.local/bin:$HOME/bin:$PATH
+
+[ -d $HOME/.cargo/bin ] && export PATH=$HOME/.cargo/bin:$PATH
+
+# Override cd to
+# - auto-use nvm when entering directories with .nvmrc
+#
+cd() {
+  builtin cd $@
+  if [ -d "$HOME/.nvm" ] && [ -f .nvmrc ]; then
+    nvm use
+  fi
+}
+
+if command -v exa >/dev/null 2>&1; then
+  alias ls='exa --icons'
+fi
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons'
+fi
+
+# it appears NixOs doesn't like it
+#l() {
+#  if command -v exa >/dev/null 2>&1; then
+#    exa --icons $@
+#  else
+#    ls $@
+#  fi
+#}
+
+la() {
+  if command -v exa >/dev/null 2>&1; then
+    exa --icons -la $@
+  else
+    if command -v eza >/dev/null 2>&1; then
+      eza --icons -la $@
+    else
+      ls -la $@
+    fi
+  fi
+}
+
+{{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
+[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
+[ -f $HOME/.autojump/etc/profile.d/autojump.sh ] && source $HOME/.autojump/etc/profile.d/autojump.sh
+{{ end }}
+
+# Override cat to use bat (-> https://github.com/sharkdp/bat) if available
+#
+cat() {
+  local batcmd="- end"
+  if [ -z "$NO_BAT" ]; then
+    if command -v bat >/dev/null 2>&1; then
+      batcmd="bat"
+    elif command -v batcat >/dev/null 2>&1; then
+      batcmd="batcat"
+    fi
+  fi
+  if [ -n "$batcmd" ]; then
+    # Map common cat options to bat equivalents
+    local bat_args=()
+    local files=()
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        -n)
+          bat_args+=("--number")
+          ;;
+        -b)
+          bat_args+=("--number-nonblank")
+          ;;
+        -s)
+          bat_args+=("--squeeze-blank")
+          ;;
+        -A)
+          bat_args+=("--show-all")
+          ;;
+        -T)
+          bat_args+=("--show-tabs")
+          ;;
+        -E)
+          bat_args+=("--show-ends")
+          ;;
+        --style=*)
+          BAT_STYLE="${1#*=}"
+          ;;
+        --paging=*)
+          BAT_PAGING=("${1#*=}")
+          ;;
+        --)
+          shift
+          while [ $# -gt 0 ]; do files+=("$1"); shift; done
+          break
+          ;;
+        -*)
+          bat_args+=("$1")
+          ;;
+        *)
+          files+=("$1")
+          ;;
+      esac
+      shift
+    done
+    BAT_STYLE="plain" BAT_PAGING="never" "$batcmd" "${bat_args[@]}" -- "${files[@]}"
+  else
+    command cat $@
+  fi
+}
+
+# OhMyPosh
+#
+# TODO: Omarchy may fail on loading oh-my-posh
+eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
+
+[ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
+# Preferred editor for local and remote sessions
+#
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  if command -v nvim >/dev/null; then
+    export EDITOR='nvim'
+    v() {
+        nvim $@
+    }
+  else
+    export EDITOR='vim'
+  fi
+fi
+
+t() {
+  task $@
+}
+
+# Bun
+#
+if [ -f $HOME/.bun/bin/bun ]; then
+  PATH="$HOME/.bun/bin/bun:$PATH"
+fi
+
+# Nvm
+#
+if [ -d "$HOME/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+
+  # This loads nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  # This loads nvm bash_completion
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+  export NODE_VERSION="lts/krypton"
+
+  # Check if Node.js is installed and matches the desired version
+  INSTALLED_VERSION=$(nvm version $NODE_VERSION)
+  if [ "$INSTALLED_VERSION" = "N/A" ]; then
+    echo "Node.js $NODE_VERSION not found. Installing..."
+    nvm install $NODE_VERSION
+  fi
+  echo "Using Node.js $NODE_VERSION"
+  nvm use $NODE_VERSION
+fi
+
+# Npx
+#
+warn() {
+  local YELLOW='\033[1;33m'
+  local NC='\033[0m'
+  echo -e "${YELLOW}⚠  $*${NC}" >&2
+}
+
+if command -v npx >/dev/null 2>&1; then
+  npx() {
+    command npx -y $@
+  }
+  ai_agent() {
+      [ -f .env.ai ] && export $(cat .env.ai | grep -v '#')
+
+      # Browser MCP (playwright/puppeteer)
+      [ -z "$BROWSER_PATH" ] && warn "'BROWSER_PATH' is not set. Browser MCP (Playwright/Puppeteer) will not work."
+
+      # CVS: GitHub
+      [ -z "$GITHUB_TOKEN" ] && warn "'GITHUB_TOKEN' is not set. GitHub MCP will not work."
+
+      # # CVS: GitLab
+      # [ -z "$GITLAB_URL" ] && warn "'GITLAB_URL' is not set. GitLab MCP will not work."
+
+      # # CVS: Forgejo
+      # [ -z "$FORGEJO_URL" ] && warn "'FORGEJO_URL' is not set. Forgejo MCP will not work."
+      # [ -z "$FORGEJO_ACCESS_TOKEN" ] && warn "'FORGEJO_ACCESS_TOKEN' is not set. Forgejo MCP will not work."
+
+      # # Code Index: CocoIndex
+      # [ -z "$COCOINDEX_PATH" ] && warn "'COCOINDEX_PATH' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_HOST" ] && warn "'COCOINDEX_DB_HOST' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_PORT" ] && warn "'COCOINDEX_DB_PORT' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_NAME" ] && warn "'COCOINDEX_DB_NAME' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_USER" ] && warn "'COCOINDEX_DB_USER' is not set. CocoIndex MCP will not work."
+      # [ -z "$COCOINDEX_DB_PASSWORD" ] && warn "'COCOINDEX_DB_PASSWORD' is not set. CocoIndex MCP will not work."
+
+      # # Code Index: FastCode
+      # [ -z "$FASTCODE_PATH" ] && warn "'FASTCODE_PATH' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_API_KEY" ] && warn "'FASTCODE_API_KEY' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_MODEL" ] && warn "'FASTCODE_MODEL' is not set. FastCode MCP will not work."
+      # [ -z "$FASTCODE_BASE_URL" ] && warn "'FASTCODE_BASE_URL' is not set. FastCode MCP will not work."
+
+      # # Web Crawl: Tavily
+      # [ -z "$TAVILY_API_KEY" ] && warn "'TAVILY_API_KEY' is not set. Tavily MCP will not work."
+
+      # # Web Crawl: Firecrawl
+      # [ -z "$FIRECRAWL_API_KEY" ] && warn "'FIRECRAWL_API_KEY' is not set. Firecrawl MCP will not work."
+
+      export PROJECT_PATH="$(pwd)"
+      npx "${1:-opencode-ai}@latest" "${@:2}"
+  }
+  claude() {
+      if ! command -v claude >/dev/null 2>&1; then
+          curl -fsSL https://claude.ai/install.sh | bash
+      fi
+      if [ -n "$UPDATE_CLAUDE" ]; then
+          curl -fsSL https://claude.ai/install.sh | bash
+      fi
+      command claude "$@"
+  }
+  codex() {
+      ai_agent @openai/codex "$@"
+  }
+  gemini() {
+      ai_agent @google/gemini-cli "$@"
+  }
+  kilo() {
+      ai_agent @kilocode/cli "$@"
+  }
+  opencode() {
+      ai_agent opencode-ai "$@"
+  }
+  oc() {
+      opencode "$@"
+  }
+  pi() {
+    ai_agent @mariozechner/pi-coding-agent "$@"
+  }
+fi
+
+
+# Go
+#
+[ -d $HOME/go/bin ] && export PATH=$HOME/go/bin:$PATH
+
+install_utils() {
+{{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
+  [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] || brew install autojump
+  [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] || {
+    git clone https://github.com/wting/autojump.git /tmp/autojump && \
+      cd /tmp/autojump && \
+      ./install.py
+  }
+
+{{ end }}
+  if ! command -v oh-my-posh >/dev/null; then
+    uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
+    uname -a | grep darwin >/dev/null 2>&1 && brew install jandedobbeleer/oh-my-posh/oh-my-posh
+  fi
+
+  if ! command -v chezmoi >/dev/null; then
+    uname -a | grep Linux >/dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
+    uname -a | grep darwin >/dev/null 2>&1 && brew install chezmoi
+
+    sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
+  fi
+
+  if ! command -v fzf >/dev/null; then
+    uname -a | grep Linux >/dev/null \
+      && [ ! -d ~/.fzf ] \
+      && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
+      && ~/.fzf/install
+    uname -a | grep darwin >/dev/null 2>&1 && brew install fzf
+  fi
+
+  if ! command -v mise >/dev/null; then
+    uname -a | grep Linux >/dev/null && curl https://mise.run | sh
+    uname -a | grep darwin >/dev/null 2>&1 && brew install mise
+  fi
+
+  if ! command -v nvm >/dev/null; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  fi
+
+  if ! command -v nvim >/dev/null; then
+    uname -a | grep Linux >/dev/null \
+      && curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz --output /tmp/nvim-linux-x86_64.tar.gz \
+      && sudo rm -rf /opt/nvim-linux-x86_64 \
+      && sudo tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
+    uname -a | grep darwin >/dev/null 2>&1 && brew install neovim
+  fi
+
+  if ! command -v uv >/dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | bash
+  fi
+
+  if ! command -v task >/dev/null; then
+    uname -a | grep Linux >/dev/null && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin 
+    uname -a | grep darwin >/dev/null 2>&1 && brew install task
+  fi
+
+  afdsafdsa 2>&1 | grep -e "^zsh" >/dev/null 2>&1 && source ~/.zshrc
+  afdsafdsa 2>&1 | grep -e "^bash" >/dev/null 2>&1 && source ~/.bashrc
+}

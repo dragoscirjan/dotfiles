@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-{{- if ne .chezmoi.os "windows" }}
+
 # Install MCP servers and LSP tools.
 # Skips sections whose runtime (go / npm) is not available, with a warning.
 
@@ -27,11 +27,11 @@ if command -v npm &>/dev/null; then
     npm install -g typescript typescript-language-server pyright bash-language-server
     echo "mcps: installing MCP servers..."
     npm install -g \
-        @modelcontextprotocol/server-memory \
-        @modelcontextprotocol/server-sequential-thinking \
-        mcp-memory-libsql
+        @modelcontextprotocol/server-memory@latest \
+        @modelcontextprotocol/server-sequential-thinking@latest \
+        mcp-memory-libsql@latest \
+        gitnexus@latest
     echo "mcps: Node.js tools and MCP servers installed"
 else
     warn "npm not found — skipping Node.js LSPs and MCP servers"
 fi
-{{- end }}

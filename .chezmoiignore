@@ -1,4 +1,5 @@
 {{ if ne .chezmoi.os "windows" }}
+.chezmoiscripts/install-mcps.ps1
 readonly_Documents/**
 Documents/**
 AppData/**
@@ -10,6 +11,11 @@ AppData/**
 .config/nvim/**
 .config/ghostty/**
 Library/**
+.chezmoiscripts/install-mcps.sh
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/configure-kwin.sh
 {{ end }}
 
 {{ if eq .chezmoi.os "linux" }}

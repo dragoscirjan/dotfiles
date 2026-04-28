@@ -26,9 +26,10 @@ if (Get-Command npm -ErrorAction SilentlyContinue) {
     npm install -g typescript typescript-language-server pyright bash-language-server
     Write-Host "mcps: installing MCP servers..."
     npm install -g `
-        @modelcontextprotocol/server-memory `
-        @modelcontextprotocol/server-sequential-thinking `
-        mcp-memory-libsql
+        @modelcontextprotocol/server-memory@latest `
+        @modelcontextprotocol/server-sequential-thinking@latest `
+        mcp-memory-libsql@latest `
+        gitnexus@latest
     Write-Host "mcps: Node.js tools and MCP servers installed"
 } else {
     Warn "npm not found — skipping Node.js LSPs and MCP servers"

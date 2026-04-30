@@ -113,6 +113,7 @@ cat() {
 eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
 
 [ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+[ -d /home/dragosc/.local/opt/nvim-linux-x86_64/bin] && export PATH="$PATH:/home/dragosc/.local/opt/nvim-linux-x86_64/bin"
 
 # Preferred editor for local and remote sessions
 #

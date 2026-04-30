@@ -1,8 +1,3 @@
-[".config/opencode"]
-type = "git-repo"
-url = "https://github.com/dragoscirjan/opencode-config.git"
-refreshPeriod = "168h"                                      # Updates weekly
-
 [".config/nvim"]
 type = "git-repo"
 url = "https://github.com/dragoscirjan/nvim-config.git"
@@ -12,3 +7,16 @@ refreshPeriod = "168h"                                  # Updates weekly
 type = "git-repo"
 url = "https://github.com/dragoscirjan/nvim-config.git"
 refreshPeriod = "168h"                                  # Updates weekly
+
+[".config/opencode"]
+type = "git-repo"
+url = "https://github.com/dragoscirjan/opencode-config.git"
+refreshPeriod = "168h"                                      # Updates weekly
+
+[".pi"]
+type = "git-repo"
+url = "https://github.com/dragoscirjan/pi-config.git"
+refreshPeriod = "168h"                                      # Updates weekly
+
+
+

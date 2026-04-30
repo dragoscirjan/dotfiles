@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-{{- if and (eq .chezmoi.os "linux") (lookPath "kwriteconfig6") }}
+{{- if lookPath "kwriteconfig6" }}
 # Configure kwin-rectangle: enable the plugin, apply shortcuts, and reload KWin.
 # Only the rectangle-specific keys are managed here; the rest of kwinrc and
 # kglobalshortcutsrc are left untouched so per-machine settings are preserved.
@@ -134,3 +134,5 @@ kw "Rectangle: Stretch: Step: (8) Top Right"       "Meta+Ctrl+9,none,Rectangle: 
 qdbus org.kde.KWin /KWin reconfigure
 echo "kwin-rectangle: KWin reloaded"
 {{- end }}
+
+echo ""

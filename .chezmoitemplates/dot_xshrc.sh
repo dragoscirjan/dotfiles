@@ -113,7 +113,7 @@ cat() {
 eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
 
 [ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
-[ -d /home/dragosc/.local/opt/nvim-linux-x86_64/bin] && export PATH="$PATH:/home/dragosc/.local/opt/nvim-linux-x86_64/bin"
+[ -d /home/dragosc/.local/opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/home/dragosc/.local/opt/nvim-linux-x86_64/bin"
 
 # Preferred editor for local and remote sessions
 #
@@ -174,8 +174,10 @@ if command -v npx >/dev/null 2>&1; then
   npx() {
     command npx -y $@
   }
-  ai_agent() {
+  ai_agent_preload() {
       [ -f .env.ai ] && export $(cat .env.ai | grep -v '#')
+      [ -f .env ] && export $(cat .env | grep -v '#')
+      [ -f ~/.env ] && export $(cat ~/.env | grep -v '#')
 
       # Browser MCP (playwright/puppeteer)
       [ -z "$BROWSER_PATH" ] && warn "'BROWSER_PATH' is not set. Browser MCP (Playwright/Puppeteer) will not work."
@@ -209,21 +211,27 @@ if command -v npx >/dev/null 2>&1; then
 
       # # Web Crawl: Firecrawl
       # [ -z "$FIRECRAWL_API_KEY" ] && warn "'FIRECRAWL_API_KEY' is not set. Firecrawl MCP will not work."
-
+  }
+  ai_agent() {
+    ai_agent_preload
       export PROJECT_PATH="$(pwd)"
       npx "${1:-opencode-ai}@latest" "${@:2}"
   }
   claude() {
-      if ! command -v claude >/dev/null 2>&1; then
+      if ! type -P claude >/dev/null 2>&1; then
           curl -fsSL https://claude.ai/install.sh | bash
       fi
       if [ -n "$UPDATE_CLAUDE" ]; then
           curl -fsSL https://claude.ai/install.sh | bash
       fi
+    ai_agent_preload
       command claude "$@"
   }
   codex() {
       ai_agent @openai/codex "$@"
+  }
+  copilot() {
+      ai_agent @github/copilot "$@"
   }
   gemini() {
       ai_agent @google/gemini-cli "$@"
@@ -238,7 +246,14 @@ if command -v npx >/dev/null 2>&1; then
       opencode "$@"
   }
   pi() {
-    ai_agent @mariozechner/pi-coding-agent "$@"
+    if ! type -P pi >/dev/null 2>&1; then
+      curl -fsSL https://pi.dev/install.sh | sh
+    fi
+    if [ -n "$UPDATE_PI" ]; then
+      curl -fsSL https://pi.dev/install.sh | sh
+    fi
+    ai_agent_preload
+    command pi "$@"
   }
 fi
 

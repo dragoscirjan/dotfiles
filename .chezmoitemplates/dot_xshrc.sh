@@ -41,6 +41,103 @@ la() {
   fi
 }
 
+# Enable wake on LAN or wake on wireless LAN when supported by the OS and adapter.
+enable_wol() {
+  local interface interface_path status supports phy_index iw_status
+  local supported=0 enabled=0
+
+{{ if eq .chezmoi.os "darwin" }}
+      if ! command -v pmset >/dev/null 2>&1; then
+        printf 'Wake on LAN is unavailable: pmset is not installed.\n' >&2
+        return 1
+      fi
+      if ! pmset -g custom 2>/dev/null | command grep -q '[[:space:]]womp[[:space:]]'; then
+        printf 'Wake on LAN is not supported by this macOS installation.\n' >&2
+        return 1
+      fi
+      if [ "$(id -u)" -eq 0 ]; then
+        if ! pmset -a womp 1; then
+          printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
+          return 1
+        fi
+      else
+        if ! command -v sudo >/dev/null 2>&1; then
+          printf 'Cannot enable wake on LAN: sudo is not installed.\n' >&2
+          return 1
+        fi
+        if ! sudo pmset -a womp 1; then
+          printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
+          return 1
+        fi
+      fi
+      printf 'Wake on LAN enabled through macOS power management.\n'
+{{ else if eq .chezmoi.os "linux" }}
+      if ! command -v ethtool >/dev/null 2>&1; then
+        printf 'Wake on LAN is unavailable: ethtool is not installed.\n' >&2
+        return 1
+      fi
+
+      for interface_path in /sys/class/net/*; do
+        [ -e "$interface_path" ] || continue
+        interface="${interface_path##*/}"
+        [ "$interface" = "lo" ] && continue
+        status="$(ethtool "$interface" 2>/dev/null)" || status=""
+        supports="$(printf '%s\n' "$status" | command sed -n 's/^[[:space:]]*Supports Wake-on:[[:space:]]*//p')"
+
+        if printf '%s\n' "$supports" | command grep -q 'g'; then
+          supported=1
+          if [ "$(id -u)" -eq 0 ]; then
+            if ! ethtool -s "$interface" wol g; then
+              printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
+              continue
+            fi
+          elif command -v sudo >/dev/null 2>&1 && sudo ethtool -s "$interface" wol g; then
+            :
+          else
+            printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
+            continue
+          fi
+          printf 'Wake on LAN enabled for %s.\n' "$interface"
+          enabled=1
+          continue
+        fi
+
+        # Some Wi-Fi drivers expose wake support through iw instead of ethtool.
+        if [ -d "$interface_path/wireless" ] && command -v iw >/dev/null 2>&1; then
+          phy_index="$(iw dev "$interface" info 2>/dev/null | command sed -n 's/^[[:space:]]*wiphy[[:space:]]*//p')"
+          if [ -n "$phy_index" ]; then
+            iw_status="$(iw phy "phy${phy_index}" wowlan show 2>/dev/null)"
+            if printf '%s\n' "$iw_status" | command grep -Eqi 'magic[- ]packet'; then
+              supported=1
+              if [ "$(id -u)" -eq 0 ]; then
+                if ! iw phy "phy${phy_index}" wowlan enable magic-packet; then
+                  printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
+                  continue
+                fi
+              elif command -v sudo >/dev/null 2>&1 && sudo iw phy "phy${phy_index}" wowlan enable magic-packet; then
+                :
+              else
+                printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
+                continue
+              fi
+              printf 'Wake on wireless LAN enabled for %s.\n' "$interface"
+              enabled=1
+            fi
+          fi
+        fi
+      done
+
+      if [ "$supported" -eq 0 ]; then
+        printf 'No network interface reports wake on LAN or wake on wireless LAN support.\n' >&2
+        return 1
+      fi
+      [ "$enabled" -eq 1 ] || return 1
+{{ else }}
+      printf 'Wake on LAN is not supported on this operating system.\n' >&2
+      return 1
+{{ end }}
+}
+
 {{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
 [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
 [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] && source $HOME/.autojump/etc/profile.d/autojump.sh

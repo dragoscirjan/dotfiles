@@ -33,14 +33,64 @@
   # Amend and push to the same commit
   amn = "!sh -c '. \"$HOME/.gitconfig.aliases/amend_and_push.sh\"; amend_and_push \"$@\"' -"
 
-  # Branch Cleanup
-  bcp = "!sh -c 'git branch | grep -v main | while read b; do git branch -d $b || git branch -D $b; done'"
+  # Force-delete all local branches except main, master, and develop
+  # Usage: git clb
+  clb = "!sh -c '. \"$HOME/.gitconfig.aliases/cleanup_local_branches.sh\"; cleanup_local_branches' -"
 
   # Merge the traditional way
   m = "!sh -c 'git config pull.rebase false && git merge "${@:-main}"'"
 
   # Merge using rebase
   mr = "!sh -c 'git config pull.rebase true && git merge "${@:-main}"'"
+
+  # Show aliases with descriptions, or detailed help for one alias
+  # Usage: git aliases [<alias>]
+  aliases = "!sh -c '. \"$HOME/.gitconfig.aliases/list_aliases.sh\"; list_aliases \"$@\"' -"
+
+# Help displayed by `git aliases`
+[aliashelp "pll"]
+  usage = git pll
+  description = Pull the current branch from origin with rebasing enabled by default.
+
+[aliashelp "psh"]
+  usage = git psh [<git-push-args>...]
+  description = Push the current branch to origin.
+
+[aliashelp "lol"]
+  usage = git lol
+  description = Show decorated commits from all refs with author details.
+
+[aliashelp "graph"]
+  usage = git graph
+  description = Show a decorated graph of commits from all refs.
+
+[aliashelp "co"]
+  usage = git co <git-checkout-args>...
+  description = Short form of git checkout.
+
+[aliashelp "c"]
+  usage = git c [<git-commit-args>...]
+  description = Short form of git commit.
+
+[aliashelp "amn"]
+  usage = git amn [<git-add-args>...] [-- <git-commit-args>...] [-- <git-push-args>...]
+  description = Stage changes, amend the current commit, and force-push with lease.
+
+[aliashelp "clb"]
+  usage = git clb
+  description = Force-delete local branches except main, master, and develop.
+
+[aliashelp "m"]
+  usage = git m [<branch>]
+  description = Disable pull rebasing and merge a branch, defaulting to main.
+
+[aliashelp "mr"]
+  usage = git mr [<branch>]
+  description = Enable pull rebasing and merge a branch, defaulting to main.
+
+[aliashelp "aliases"]
+  usage = git aliases [<alias>]
+  description = List documented aliases or show detailed help for one alias.
 
 # Core configuration settings for Git behavior
 [core]

@@ -1,6 +1,12 @@
 
 export PATH=$HOME/.local/bin:$HOME/bin:$PATH
 
+warn() {
+  local YELLOW='\033[1;33m'
+  local NC='\033[0m'
+  echo -e "${YELLOW}⚠  $*${NC}" >&2
+}
+
 [ -d $HOME/.cargo/bin ] && export PATH=$HOME/.cargo/bin:$PATH
 
 # Override cd to
@@ -41,106 +47,121 @@ la() {
   fi
 }
 
-# Enable wake on LAN or wake on wireless LAN when supported by the OS and adapter.
-enable_wol() {
-  local interface interface_path status supports phy_index iw_status
-  local supported=0 enabled=0
+# TODO: Wake on LAN idea didn't work as planned... I replaced it with Owly
+#
+# # Enable wake on LAN or wake on wireless LAN when supported by the OS and adapter.
+# enable_wol() {
+#   local interface interface_path status supports phy_index iw_status
+#   local supported=0 enabled=0
+#
+# {{ if eq .chezmoi.os "darwin" }}
+#       if ! command -v pmset >/dev/null 2>&1; then
+#         printf 'Wake on LAN is unavailable: pmset is not installed.\n' >&2
+#         return 1
+#       fi
+#       if ! pmset -g custom 2>/dev/null | command grep -q '[[:space:]]womp[[:space:]]'; then
+#         printf 'Wake on LAN is not supported by this macOS installation.\n' >&2
+#         return 1
+#       fi
+#       if [ "$(id -u)" -eq 0 ]; then
+#         if ! pmset -a womp 1; then
+#           printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
+#           return 1
+#         fi
+#       else
+#         if ! command -v sudo >/dev/null 2>&1; then
+#           printf 'Cannot enable wake on LAN: sudo is not installed.\n' >&2
+#           return 1
+#         fi
+#         if ! sudo pmset -a womp 1; then
+#           printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
+#           return 1
+#         fi
+#       fi
+#       printf 'Wake on LAN enabled through macOS power management.\n'
+# {{ else if eq .chezmoi.os "linux" }}
+#       if ! command -v ethtool >/dev/null 2>&1; then
+#         printf 'Wake on LAN is unavailable: ethtool is not installed.\n' >&2
+#         return 1
+#       fi
+#
+#       for interface_path in /sys/class/net/*; do
+#         [ -e "$interface_path" ] || continue
+#         interface="${interface_path##*/}"
+#         [ "$interface" = "lo" ] && continue
+#         status="$(ethtool "$interface" 2>/dev/null)" || status=""
+#         supports="$(printf '%s\n' "$status" | command sed -n 's/^[[:space:]]*Supports Wake-on:[[:space:]]*//p')"
+#
+#         if printf '%s\n' "$supports" | command grep -q 'g'; then
+#           supported=1
+#           if [ "$(id -u)" -eq 0 ]; then
+#             if ! ethtool -s "$interface" wol g; then
+#               printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
+#               continue
+#             fi
+#           elif command -v sudo >/dev/null 2>&1 && sudo ethtool -s "$interface" wol g; then
+#             :
+#           else
+#             printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
+#             continue
+#           fi
+#           printf 'Wake on LAN enabled for %s.\n' "$interface"
+#           enabled=1
+#           continue
+#         fi
+#
+#         # Some Wi-Fi drivers expose wake support through iw instead of ethtool.
+#         if [ -d "$interface_path/wireless" ] && command -v iw >/dev/null 2>&1; then
+#           phy_index="$(iw dev "$interface" info 2>/dev/null | command sed -n 's/^[[:space:]]*wiphy[[:space:]]*//p')"
+#           if [ -n "$phy_index" ]; then
+#             iw_status="$(iw phy "phy${phy_index}" wowlan show 2>/dev/null)"
+#             if printf '%s\n' "$iw_status" | command grep -Eqi 'magic[- ]packet'; then
+#               supported=1
+#               if [ "$(id -u)" -eq 0 ]; then
+#                 if ! iw phy "phy${phy_index}" wowlan enable magic-packet; then
+#                   printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
+#                   continue
+#                 fi
+#               elif command -v sudo >/dev/null 2>&1 && sudo iw phy "phy${phy_index}" wowlan enable magic-packet; then
+#                 :
+#               else
+#                 printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
+#                 continue
+#               fi
+#               printf 'Wake on wireless LAN enabled for %s.\n' "$interface"
+#               enabled=1
+#             fi
+#           fi
+#         fi
+#       done
+#
+#       if [ "$supported" -eq 0 ]; then
+#         printf 'No network interface reports wake on LAN or wake on wireless LAN support.\n' >&2
+#         return 1
+#       fi
+#       [ "$enabled" -eq 1 ] || return 1
+# {{ else }}
+#       printf 'Wake on LAN is not supported on this operating system.\n' >&2
+#       return 1
+# {{ end }}
+# }
 
-{{ if eq .chezmoi.os "darwin" }}
-      if ! command -v pmset >/dev/null 2>&1; then
-        printf 'Wake on LAN is unavailable: pmset is not installed.\n' >&2
-        return 1
-      fi
-      if ! pmset -g custom 2>/dev/null | command grep -q '[[:space:]]womp[[:space:]]'; then
-        printf 'Wake on LAN is not supported by this macOS installation.\n' >&2
-        return 1
-      fi
-      if [ "$(id -u)" -eq 0 ]; then
-        if ! pmset -a womp 1; then
-          printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
-          return 1
-        fi
-      else
-        if ! command -v sudo >/dev/null 2>&1; then
-          printf 'Cannot enable wake on LAN: sudo is not installed.\n' >&2
-          return 1
-        fi
-        if ! sudo pmset -a womp 1; then
-          printf 'Unable to enable wake on LAN through macOS power management.\n' >&2
-          return 1
-        fi
-      fi
-      printf 'Wake on LAN enabled through macOS power management.\n'
-{{ else if eq .chezmoi.os "linux" }}
-      if ! command -v ethtool >/dev/null 2>&1; then
-        printf 'Wake on LAN is unavailable: ethtool is not installed.\n' >&2
-        return 1
-      fi
 
-      for interface_path in /sys/class/net/*; do
-        [ -e "$interface_path" ] || continue
-        interface="${interface_path##*/}"
-        [ "$interface" = "lo" ] && continue
-        status="$(ethtool "$interface" 2>/dev/null)" || status=""
-        supports="$(printf '%s\n' "$status" | command sed -n 's/^[[:space:]]*Supports Wake-on:[[:space:]]*//p')"
+# Autojump -> j
+#
 
-        if printf '%s\n' "$supports" | command grep -q 'g'; then
-          supported=1
-          if [ "$(id -u)" -eq 0 ]; then
-            if ! ethtool -s "$interface" wol g; then
-              printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
-              continue
-            fi
-          elif command -v sudo >/dev/null 2>&1 && sudo ethtool -s "$interface" wol g; then
-            :
-          else
-            printf 'Unable to enable wake on LAN for %s.\n' "$interface" >&2
-            continue
-          fi
-          printf 'Wake on LAN enabled for %s.\n' "$interface"
-          enabled=1
-          continue
-        fi
-
-        # Some Wi-Fi drivers expose wake support through iw instead of ethtool.
-        if [ -d "$interface_path/wireless" ] && command -v iw >/dev/null 2>&1; then
-          phy_index="$(iw dev "$interface" info 2>/dev/null | command sed -n 's/^[[:space:]]*wiphy[[:space:]]*//p')"
-          if [ -n "$phy_index" ]; then
-            iw_status="$(iw phy "phy${phy_index}" wowlan show 2>/dev/null)"
-            if printf '%s\n' "$iw_status" | command grep -Eqi 'magic[- ]packet'; then
-              supported=1
-              if [ "$(id -u)" -eq 0 ]; then
-                if ! iw phy "phy${phy_index}" wowlan enable magic-packet; then
-                  printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
-                  continue
-                fi
-              elif command -v sudo >/dev/null 2>&1 && sudo iw phy "phy${phy_index}" wowlan enable magic-packet; then
-                :
-              else
-                printf 'Unable to enable wake on wireless LAN for %s.\n' "$interface" >&2
-                continue
-              fi
-              printf 'Wake on wireless LAN enabled for %s.\n' "$interface"
-              enabled=1
-            fi
-          fi
-        fi
-      done
-
-      if [ "$supported" -eq 0 ]; then
-        printf 'No network interface reports wake on LAN or wake on wireless LAN support.\n' >&2
-        return 1
-      fi
-      [ "$enabled" -eq 1 ] || return 1
-{{ else }}
-      printf 'Wake on LAN is not supported on this operating system.\n' >&2
-      return 1
-{{ end }}
-}
+# TODO: wonder whether I should replace it with 'z'; but which z ??
 
 {{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
-[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
-[ -f $HOME/.autojump/etc/profile.d/autojump.sh ] && source $HOME/.autojump/etc/profile.d/autojump.sh
+if [ -n "$ZSH_VERSION" ]; then 
+  [ -f /etc/profiles/per-user/$USER/share/zsh/site-functions/autojump.zsh ] && . /etc/profiles/per-user/$USER/share/zsh/site-functions/autojump.zsh
+else
+  for j_path in "/etc/profiles/per-user/$USER/etc/profile.d/autojump.sh" \
+    "$HOMEBREW_PREFIX/etc/profile.d/autojump.sh" \
+    "$HOME/.autojump/etc/profile.d/autojump.sh"; do 
+    [ -f $j_path ] && . $j_path && break;
+  done
+fi
 {{ end }}
 
 {{ if (or (eq .chezmoi.hostname "mac-m5")) }}
@@ -161,6 +182,9 @@ fi
 
 # Override cat to use bat (-> https://github.com/sharkdp/bat) if available
 #
+
+# TODO: wrap command with if command bat || command batcat ...
+
 cat() {
   local batcmd="- end"
   if [ -z "$NO_BAT" ]; then
@@ -222,8 +246,13 @@ cat() {
 
 # OhMyPosh
 #
+
 # TODO: Omarchy may fail on loading oh-my-posh
+# TODO: should wrap the command under an if command ... 
 eval "$(oh-my-posh init $(oh-my-posh get shell) --config ~/ohmyposh.config.toml)"
+
+# Neovim
+#
 
 [ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 [ -d /home/dragosc/.local/opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/home/dragosc/.local/opt/nvim-linux-x86_64/bin"
@@ -249,12 +278,14 @@ t() {
 
 # Bun
 #
+
 if [ -f $HOME/.bun/bin/bun ]; then
   PATH="$HOME/.bun/bin/bun:$PATH"
 fi
 
 # Nvm
 #
+
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
 
@@ -277,26 +308,27 @@ fi
 
 # Npx
 #
-warn() {
-  local YELLOW='\033[1;33m'
-  local NC='\033[0m'
-  echo -e "${YELLOW}⚠  $*${NC}" >&2
-}
 
 if command -v npx >/dev/null 2>&1; then
   npx() {
     command npx -y $@
   }
   ai_agent_preload() {
-      [ -f .env.ai ] && export $(cat .env.ai | grep -v '#')
-      [ -f .env ] && export $(cat .env | grep -v '#')
-      [ -f ~/.env ] && export $(cat ~/.env | grep -v '#')
+      set -a
+      [ -f ./.env.ai ] && source ./.env.ai
+      [ -f ./.env ] && source ./.env
+      [ -f ~/.env ] && source ~/.env
+      set +a 
+
+      [ -n "$GITHUB_TOKEN" ] && [ -z "$GH_TOKEN" ] && export GH_TOKEN="$GITHUB_TOKEN"
+      [ -n "$GH_TOKEN" ] && [ -z "$GITHUB_TOKEN" ] && export GITHUB_TOKEN="$GH_TOKEN"
 
       # Browser MCP (playwright/puppeteer)
       [ -z "$BROWSER_PATH" ] && warn "'BROWSER_PATH' is not set. Browser MCP (Playwright/Puppeteer) will not work."
 
       # CVS: GitHub
       [ -z "$GITHUB_TOKEN" ] && warn "'GITHUB_TOKEN' is not set. GitHub MCP will not work."
+      [ -z "$GH_TOKEN" ] && warn "'GH_TOKEN' is not set. GitHub MCP will not work."
 
       # # CVS: GitLab
       # [ -z "$GITLAB_URL" ] && warn "'GITLAB_URL' is not set. GitLab MCP will not work."
@@ -325,11 +357,13 @@ if command -v npx >/dev/null 2>&1; then
       # # Web Crawl: Firecrawl
       # [ -z "$FIRECRAWL_API_KEY" ] && warn "'FIRECRAWL_API_KEY' is not set. Firecrawl MCP will not work."
   }
+
   ai_agent() {
     ai_agent_preload
       export PROJECT_PATH="$(pwd)"
       npx "${1:-opencode-ai}@latest" "${@:2}"
   }
+
   claude() {
       if ! type -P claude >/dev/null 2>&1; then
           curl -fsSL https://claude.ai/install.sh | bash
@@ -340,24 +374,31 @@ if command -v npx >/dev/null 2>&1; then
     ai_agent_preload
       command claude "$@"
   }
+
   codex() {
       ai_agent @openai/codex "$@"
   }
+
   copilot() {
       ai_agent @github/copilot "$@"
   }
+
   gemini() {
       ai_agent @google/gemini-cli "$@"
   }
+
   kilo() {
       ai_agent @kilocode/cli "$@"
   }
+
   opencode() {
       ai_agent opencode-ai "$@"
   }
+  
   oc() {
       opencode "$@"
   }
+  
   pi() {
     if ! type -P pi >/dev/null 2>&1; then
       curl -fsSL https://pi.dev/install.sh | sh
@@ -368,6 +409,21 @@ if command -v npx >/dev/null 2>&1; then
     ai_agent_preload
     command pi "$@"
   }
+
+fi
+
+# Gh
+#
+
+if command -v gh >/dev/null 2>&1; then
+  gh-dash() {
+    set -a
+    [ -f ~/.env ] && source ~/.env
+    set +a 
+
+    gh help | grep dash >/dev/null 2>&1 || gh extension install dlvhdr/gh-dash
+    gh dash
+  }
 fi
 
 
@@ -375,62 +431,137 @@ fi
 #
 [ -d $HOME/go/bin ] && export PATH=$HOME/go/bin:$PATH
 
-install_utils() {
-{{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
-  [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] || brew install autojump
-  [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] || {
-    git clone https://github.com/wting/autojump.git /tmp/autojump && \
-      cd /tmp/autojump && \
-      ./install.py
-  }
+# TODO: this should be moved to install scripts like nix
 
-{{ end }}
-  if ! command -v oh-my-posh >/dev/null; then
-    uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
-    uname -a | grep darwin >/dev/null 2>&1 && brew install jandedobbeleer/oh-my-posh/oh-my-posh
-  fi
+# install_utils() {
+# {{ if (and (ne .chezmoi.hostname "tw-nixos") (ne .chezmoi.hostname "vm-nixos")) }}
+#   [ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] || brew install autojump
+#   [ -f $HOME/.autojump/etc/profile.d/autojump.sh ] || {
+#     git clone https://github.com/wting/autojump.git /tmp/autojump && \
+#       cd /tmp/autojump && \
+#       ./install.py
+#   }
+#
+# {{ end }}
+#   if ! command -v oh-my-posh >/dev/null; then
+#     uname -a | grep Linux >/dev/null && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/bin
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install jandedobbeleer/oh-my-posh/oh-my-posh
+#   fi
+#
+#   if ! command -v chezmoi >/dev/null; then
+#     uname -a | grep Linux >/dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install chezmoi
+#
+#     sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
+#   fi
+#
+#   if ! command -v fzf >/dev/null; then
+#     uname -a | grep Linux >/dev/null \
+#       && [ ! -d ~/.fzf ] \
+#       && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
+#       && ~/.fzf/install
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install fzf
+#   fi
+#
+#   if ! command -v mise >/dev/null; then
+#     uname -a | grep Linux >/dev/null && curl https://mise.run | sh
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install mise
+#   fi
+#
+#   if ! command -v nvm >/dev/null; then
+#     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+#   fi
+#
+#   if ! command -v nvim >/dev/null; then
+#     uname -a | grep Linux >/dev/null \
+#       && curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz --output /tmp/nvim-linux-x86_64.tar.gz \
+#       && sudo rm -rf /opt/nvim-linux-x86_64 \
+#       && sudo tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install neovim
+#   fi
+#
+#   if ! command -v uv >/dev/null; then
+#     curl -LsSf https://astral.sh/uv/install.sh | bash
+#   fi
+#
+#   if ! command -v task >/dev/null; then
+#     uname -a | grep Linux >/dev/null && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin 
+#     uname -a | grep darwin >/dev/null 2>&1 && brew install task
+#   fi
+#
+# afdsafdsa 2>&1 | grep -e "^zsh" >/dev/null 2>&1 && source ~/.zshrc
+# afdsafdsa 2>&1 | grep -e "^bash" >/dev/null 2>&1 && source ~/.bashrc
+# }
 
-  if ! command -v chezmoi >/dev/null; then
-    uname -a | grep Linux >/dev/null && sh -c "$(curl -fsLS get.chezmoi.io)"
-    uname -a | grep darwin >/dev/null 2>&1 && brew install chezmoi
+# TODO: tools didn't work on mac, so I am giving up on the idea
 
-    sh -c "chezmoi init --apply git@github.com:dragoscirjan/dotfiles.git"
-  fi
-
-  if ! command -v fzf >/dev/null; then
-    uname -a | grep Linux >/dev/null \
-      && [ ! -d ~/.fzf ] \
-      && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
-      && ~/.fzf/install
-    uname -a | grep darwin >/dev/null 2>&1 && brew install fzf
-  fi
-
-  if ! command -v mise >/dev/null; then
-    uname -a | grep Linux >/dev/null && curl https://mise.run | sh
-    uname -a | grep darwin >/dev/null 2>&1 && brew install mise
-  fi
-
-  if ! command -v nvm >/dev/null; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-  fi
-
-  if ! command -v nvim >/dev/null; then
-    uname -a | grep Linux >/dev/null \
-      && curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz --output /tmp/nvim-linux-x86_64.tar.gz \
-      && sudo rm -rf /opt/nvim-linux-x86_64 \
-      && sudo tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
-    uname -a | grep darwin >/dev/null 2>&1 && brew install neovim
-  fi
-
-  if ! command -v uv >/dev/null; then
-    curl -LsSf https://astral.sh/uv/install.sh | bash
-  fi
-
-  if ! command -v task >/dev/null; then
-    uname -a | grep Linux >/dev/null && sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin 
-    uname -a | grep darwin >/dev/null 2>&1 && brew install task
-  fi
-
-  afdsafdsa 2>&1 | grep -e "^zsh" >/dev/null 2>&1 && source ~/.zshrc
-  afdsafdsa 2>&1 | grep -e "^bash" >/dev/null 2>&1 && source ~/.bashrc
-}
+# # Wake on LAN utility with retry logic and LM Studio server check
+# wol_wake() {
+#     local mac_addr="$1" bcast_ip="$2" machine_ip="$3" retries=${4:-5}
+#
+#     # Source ~/.env if it exists (only once, before checking args)
+#     [ -f ~/.env ] && export $(cat ~/.env | grep -v '^#' | xargs) 2>/dev/null || true
+#
+#     # Only fill missing arguments from environment
+#     [ -z "$mac_addr" ] && mac_addr="${WOL_MAC_ADDRESS:-}"
+#     [ -z "$bcast_ip" ] && bcast_ip="${WOL_BCAST_IP:-}"
+#     [ -z "$machine_ip" ] && machine_ip="${WOL_MACHINE_IP:-}"
+#     [ -z "$retries" ] && retries="${WOL_RETRIES:-5}"
+#
+#     # Check if all required parameters are set
+#     if [ -z "$mac_addr" ] || [ -z "$bcast_ip" ] || [ -z "$machine_ip" ]; then
+#         echo "Error: MAC address, broadcast IP, and machine IP must be provided as arguments or set in environment (WOL_MAC_ADDRESS, WOL_BCAST_IP, WOL_MACHINE_IP)." >&2
+#         return 1
+#     fi
+#
+#     # Validate MAC address format (XX:XX:XX:XX:XX:XX).
+#     case "$mac_addr" in
+#         [0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F])
+#             ;;
+#         *)
+#             echo "Error: Invalid MAC address format: '$mac_addr'. Expected format: XX:XX:XX:XX:XX:XX" >&2
+#             return 1
+#             ;;
+#     esac
+#
+#     # Check if wakeonlan command is available
+#     if ! command -v wakeonlan >/dev/null 2>&1; then
+#         echo "Error: wakeonlan command not found. Please install it (e.g., sudo apt install wakeonlan)." >&2
+#         return 1
+#     fi
+#
+#     local success=0
+#     local i=1
+#
+#     while [ $i -le $retries ]; do
+#         echo "Attempt $i/$retries: Sending Wake-on-LAN packet to $mac_addr via $bcast_ip"
+#         command wakeonlan -i "$bcast_ip" "$mac_addr"
+#
+#         echo "Waiting 5 seconds for machine to wake up..."
+#         sleep 5
+#
+#         if ping -c 1 -W 2 "$machine_ip" >/dev/null 2>&1; then
+#             echo "Machine at $machine_ip is responding to ping."
+#             success=1
+#         else
+#             echo "Machine at $machine_ip did not respond to ping."
+#         fi
+#         [ $i -lt $retries ] && echo "Retrying..."
+#         i=$((i + 1))
+#     done
+#
+#     if [ $success -eq 0 ]; then
+#         echo "Failed to wake machine after $retries attempts." >&2
+#         return 1
+#     fi
+#
+#     # Check if LM Studio server is running on port 1234
+#     echo "Checking if LM Studio server is reachable at $machine_ip:1234..."
+#     if ! nc -z -w 5 "$machine_ip" 1234 >/dev/null 2>&1; then
+#         echo "Warning: LM Studio server on $machine_ip:1234 is not reachable (may not be started or network issue)." >&2
+#     else
+#         echo "LM Studio server is reachable at $machine_ip:1234."
+#     fi
+#
+#     return 0
+# }
